@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anchana Prabakaran – Data Analyst</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────── */
+    :root {
+      --bg:          #0a0b0e;
+      --bg-raised:   #111318;
+      --bg-card:     #161820;
+      --border:      #21252f;
+      --border-soft: #1c1f28;
+
+      --text:        #e8eaf0;
+      --text-soft:   #8b90a0;
+      --text-muted:  #4a5060;
+
+      --gold:        #c9a84c;
+      --gold-dim:    rgba(201,168,76,.12);
+      --teal:        #2dd4bf;
+      --teal-dim:    rgba(45,212,191,.1);
+
+      --display:     'DM Serif Display', Georgia, serif;
+      --body:        'Inter', sans-serif;
+      --max:         1080px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--body);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap {
+      max-width: var(--max);
+      margin-inline: auto;
+      padding-inline: clamp(1.25rem, 5vw, 3rem);
+    }
+
+    /* ── NAV ─────────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,11,14,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-block: 1.1rem;
+    }
+    .nav-logo {
+      font-family: var(--display);
+      font-size: 1.15rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: 0.01em;
+    }
+    .nav-logo em { color: var(--gold); font-style: normal; }
+    nav ul { list-style: none; display: flex; gap: 2.25rem; }
+    nav a {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    nav a:hover { color: var(--gold); }
+
+    /* ── HERO ─────────────────────────────────────────────── */
+    .hero {
+      padding-block: clamp(4.5rem, 11vw, 8rem);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: -40%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 3rem;
+    }
+    .hero-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+    .hero-eyebrow span {
+      display: block;
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+      opacity: .6;
+    }
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(3rem, 8vw, 5.75rem);
+      font-weight: 400;
+      line-height: 1.0;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+    .hero-desc {
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--text-soft);
+      max-width: 500px;
+      line-height: 1.8;
+      margin-bottom: 2.25rem;
+    }
+    .cert-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .7rem;
+      border: 1px solid var(--border);
+      background: var(--bg-raised);
+      padding: .55rem 1.1rem .55rem .65rem;
+      border-radius: 6px;
+      font-size: 0.73rem;
+      font-weight: 500;
+      letter-spacing: .03em;
+      color: var(--text-soft);
+    }
+    .cert-badge .live {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      background: var(--teal-dim);
+      color: var(--teal);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: .25rem .6rem;
+      border-radius: 4px;
+    }
+    .cert-badge .live::before {
+      content: '';
+      display: block;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: blink 2s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%,100% { opacity: 1; }
+      50%      { opacity: .3; }
+    }
+    .hero-contact {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: .8rem;
+      padding-bottom: .25rem;
+    }
+    .hero-contact a {
+      font-size: 0.82rem;
+      color: var(--text-soft);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .hero-contact a:hover { color: var(--gold); }
+    .contact-label {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: .1rem;
+    }
+    .contact-item { text-align: right; }
+
+    /* ── DIVIDER ─────────────────────────────────────────── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border) 20%, var(--border) 80%, transparent);
+      margin: 0;
+    }
+
+    /* ── SECTION BASE ────────────────────────────────────── */
+    section { padding-block: clamp(3rem, 7vw, 5rem); border-bottom: 1px solid var(--border); }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    .eyebrow {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+    .eyebrow-rule {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    h2 {
+      font-family: var(--display);
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-bottom: 1.75rem;
+    }
+
+    /* ── SUMMARY ─────────────────────────────────────────── */
+    .summary-text {
+      font-size: 1rem;
+      color: var(--text-soft);
+      max-width: 680px;
+      line-height: 1.85;
+    }
+
+    /* ── SKILLS ──────────────────────────────────────────── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .skill-card {
+      background: var(--bg-card);
+      padding: 1.5rem 1.4rem;
+      transition: background .2s;
+    }
+    .skill-card:hover { background: var(--bg-raised); }
+    .skill-card-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: .85rem;
+    }
+    .skill-card ul { list-style: none; display: flex; flex-direction: column; gap: .4rem; }
+    .skill-card li {
+      font-size: 0.85rem;
+      color: var(--text-soft);
+    }
+    .skill-card li::before {
+      content: '–  ';
+      color: var(--text-muted);
+    }
+
+    /* ── EXPERIENCE ──────────────────────────────────────── */
+    .exp-company {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 1.4rem 1.6rem;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
+      border-radius: 8px 8px 0 0;
+      border-bottom: 1px solid var(--border-soft);
+      margin-bottom: 0;
+      flex-wrap: wrap;
+      gap: .75rem;
+    }
+    .exp-role { font-family: var(--display); font-size: 1.1rem; color: var(--text); }
+    .exp-org  { font-size: 0.8rem; color: var(--text-muted); margin-top: .15rem; }
+    .exp-period {
+      font-size: 0.73rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: .3rem .85rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .projects-wrap {
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      overflow: hidden;
+      margin-bottom: 0;
+    }
+
+    .project {
+      padding: 1.6rem 1.7rem;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-soft);
+      transition: background .2s;
+    }
+    .project:last-child { border-bottom: none; }
+    .project:hover { background: #13151d; }
+
+    .project-tag {
+      font-size: 0.63rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: .5rem;
+    }
+    .project h3 {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+    .project ul { padding-left: 1rem; display: flex; flex-direction: column; gap: .45rem; }
+    .project li { font-size: 0.85rem; color: var(--text-soft); }
+
+    /* ── CERTIFICATIONS ──────────────────────────────────── */
+    .cert-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      padding: 1.75rem 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .cert-name {
+      font-family: var(--display);
+      font-size: 1.1rem;
+      color: var(--text);
+    }
+    .cert-meta { display: flex; gap: 2rem; flex-wrap: wrap; align-items: center; }
+    .cert-date-block { text-align: center; }
+    .cert-date-label {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: .15rem;
+    }
+    .cert-date-val { font-size: 0.88rem; color: var(--text-soft); }
+    .status-active {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      background: var(--teal-dim);
+      color: var(--teal);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: .35rem .8rem;
+      border-radius: 4px;
+      border: 1px solid rgba(45,212,191,.2);
+    }
+    .status-active::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--teal);
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    /* ── EDUCATION ───────────────────────────────────────── */
+    .edu-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      padding: 1.75rem 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .edu-degree { font-family: var(--display); font-size: 1.1rem; color: var(--text); }
+    .edu-school { font-size: 0.82rem; color: var(--text-muted); margin-top: .25rem; }
+    .edu-stats { display: flex; gap: 2rem; }
+    .edu-stat { text-align: right; }
+    .edu-stat-val {
+      font-family: var(--display);
+      font-size: 1.75rem;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .edu-stat-label {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: .2rem;
+    }
+    .edu-honour {
+      font-size: 0.78rem;
+      color: var(--teal);
+      font-weight: 500;
+      margin-top: .3rem;
+    }
+
+    /* ── FOOTER ──────────────────────────────────────────── */
+    footer {
+      padding-block: 2.5rem;
+      text-align: center;
+    }
+    footer p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--gold); }
+
+    /* ── RESPONSIVE ──────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .hero-grid    { grid-template-columns: 1fr; }
+      .hero-contact { align-items: flex-start; }
+      .contact-item { text-align: left; }
+      .edu-stat     { text-align: left; }
+      nav ul        { gap: 1.25rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap">
+    <a class="nav-logo" href="#">Anchana Prabakaran<em>.</em></a>
+    <ul>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#education">Education</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <p class="hero-eyebrow"><span></span>Data Analyst &nbsp;·&nbsp; Chennai, India</p>
+        <h1>Anchana<br>Prabakaran</h1>
+        <p class="hero-desc">
+          2+ years engineering data pipelines, migrating hundreds of SSRS
+          reports to Databricks, and delivering Power&nbsp;BI dashboards that
+          drive business decisions.
+        </p>
+        <div class="cert-badge">
+          <span class="live">Active</span>
+          Databricks Certified Data Engineer Associate
+        </div>
+      </div>
+      <div class="hero-contact">
+        <div class="contact-item">
+          <div class="contact-label">Email</div>
+          <a href="mailto:anchana.professional@gmail.com">anchana.professional@gmail.com</a>
+        </div>
+        <div class="contact-item">
+          <div class="contact-label">Phone</div>
+          <a href="tel:9566231364">+91 9566231364</a>
+        </div>
+        <div class="contact-item">
+          <div class="contact-label">LinkedIn</div>
+          <a href="https://www.linkedin.com/in/anchana-prabakaran" target="_blank" rel="noopener">anchana-prabakaran ↗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- SUMMARY -->
+<section id="summary">
+  <div class="wrap">
+    <div class="section-header">
+      <span class="eyebrow">Profile</span>
+      <div class="eyebrow-rule"></div>
+    </div>
+    <p class="summary-text">
+      Detail-oriented data analyst with proven expertise in SSRS-to-Databricks migration at scale,
+      Power BI dashboard development, and data validation using Python. Comfortable across the full
+      data stack — from converting T-SQL to Databricks-compatible SQL and configuring ODBC connectors,
+      to deploying DBT models through Azure DevOps CI/CD. Certified Databricks Data Engineer Associate.
+    </p>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="wrap">
+    <div class="section-header">
+      <span class="eyebrow">Technical Skills</span>
+      <div class="eyebrow-rule"></div>
+    </div>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="skill-card-label">Data Platforms</div>
+        <ul>
+          <li>Databricks</li>
+          <li>SQL Server</li>
+          <li>Azure DevOps</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-label">Reporting</div>
+        <ul>
+          <li>Power BI</li>
+          <li>SSRS</li>
+          <li>DAX</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-label">Languages</div>
+        <ul>
+          <li>Python</li>
+          <li>T-SQL</li>
+          <li>DAX</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-label">ETL & Pipelines</div>
+        <ul>
+          <li>DBT</li>
+          <li>ETL Transformations</li>
+          <li>CI/CD Pipelines</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-label">Integration</div>
+        <ul>
+          <li>ODBC</li>
+          <li>Simba Spark Driver</li>
+          <li>PAT Authentication</li>
+        </ul>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-label">Cloud & DevOps</div>
+        <ul>
+          <li>Azure DevOps</li>
+          <li>Version Control</li>
+          <li>Pipeline Management</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="wrap">
+    <div class="section-header">
+      <span class="eyebrow">Work Experience</span>
+      <div class="eyebrow-rule"></div>
+    </div>
+
+    <div class="exp-company">
+      <div>
+        <div class="exp-role">Data Analyst</div>
+        <div class="exp-org">Service Based Company</div>
+      </div>
+      <div class="exp-period">October 2023 – Present &nbsp;·&nbsp; 1 yr 8 mo+</div>
+    </div>
+
+    <div class="projects-wrap">
+      <div class="project">
+        <p class="project-tag">Project 01</p>
+        <h3>Power BI Dashboard Development</h3>
+        <ul>
+          <li>Designed and delivered multiple Power BI dashboards — Portfolio at Risk, Agent Productivity, Claims, and Insurance — for business stakeholders.</li>
+          <li>Developed DAX measures and data models to support dynamic reporting and KPI tracking.</li>
+          <li>Collaborated with business teams to gather requirements and translate them into actionable visual analytics.</li>
+        </ul>
+      </div>
+
+      <div class="project">
+        <p class="project-tag">Project 02</p>
+        <h3>SSRS-to-Databricks Migration &nbsp;(200–400 Reports)</h3>
+        <ul>
+          <li>Led end-to-end migration of 200–400 SSRS reports from SQL Server to Databricks, converting embedded T-SQL to Databricks-compatible SQL.</li>
+          <li>Automated extraction of table references and T-SQL queries from .rdl files using Python scripting, significantly reducing manual effort.</li>
+          <li>Configured ODBC connectivity via Simba Spark Driver and Databricks Personal Access Tokens to repoint reports to the new platform.</li>
+          <li>Performed thorough validation of query outputs between SQL Server and Databricks, classifying discrepancies as data sync or logic issues.</li>
+          <li>Investigated and resolved query-level discrepancies, ensuring data accuracy and consistency post-migration.</li>
+        </ul>
+      </div>
+
+      <div class="project">
+        <p class="project-tag">Project 03</p>
+        <h3>ETL Pipeline Development &amp; DBT Deployment on Azure DevOps</h3>
+        <ul>
+          <li>Designed and implemented ETL transformation logic for Databricks to process and structure raw data for downstream consumption.</li>
+          <li>Packaged and deployed ETL scripts as DBT models through Azure DevOps CI/CD pipelines.</li>
+          <li>Ensured transformation logic adhered to data quality standards with full version control in the DevOps repository.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section id="certifications">
+  <div class="wrap">
+    <div class="section-header">
+      <span class="eyebrow">Certifications</span>
+      <div class="eyebrow-rule"></div>
+    </div>
+    <div class="cert-row">
+      <div class="cert-name">Databricks Certified Data Engineer Associate</div>
+      <div class="cert-meta">
+        <div class="cert-date-block">
+          <div class="cert-date-label">Issued</div>
+          <div class="cert-date-val">June 1, 2026</div>
+        </div>
+        <div class="cert-date-block">
+          <div class="cert-date-label">Valid Until</div>
+          <div class="cert-date-val">June 1, 2028</div>
+        </div>
+        <div class="status-active">Active</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="wrap">
+    <div class="section-header">
+      <span class="eyebrow">Education</span>
+      <div class="eyebrow-rule"></div>
+    </div>
+    <div class="edu-card">
+      <div>
+        <div class="edu-degree">B.E. – Computer Science &amp; Engineering</div>
+        <div class="edu-school">Meenakshi Sundararajan Engineering College</div>
+        <div class="edu-honour">First Class with Distinction</div>
+      </div>
+      <div class="edu-stats">
+        <div class="edu-stat">
+          <div class="edu-stat-val">8.84</div>
+          <div class="edu-stat-label">CGPA</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <p>© 2026 Anchana Prabakaran &nbsp;·&nbsp; Chennai, India &nbsp;·&nbsp;
+      <a href="mailto:anchana.professional@gmail.com">anchana.professional@gmail.com</a>
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
