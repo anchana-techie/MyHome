@@ -103,9 +103,46 @@
     .hero-grid {
       display: grid;
       grid-template-columns: 1fr auto;
-      align-items: end;
-      gap: 3rem;
+      align-items: center;
+      gap: 1.5rem;
     }
+    .hero-photo-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 1.5rem;
+    }
+    .hero-photo-wrap {
+      position: relative;
+      width: 210px;
+      height: 260px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+    .hero-photo-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, transparent 40%, var(--bg) 100%),
+        linear-gradient(to left,   transparent 50%, rgba(10,11,14,0.85) 100%);
+      border-radius: 12px;
+      pointer-events: none;
+      transition: opacity .4s;
+    }
+    .hero-photo-wrap:hover::after { opacity: 0.4; }
+    .hero-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+      filter: grayscale(20%);
+      transition: filter .4s;
+    }
+    .hero-photo-wrap:hover .hero-photo { filter: grayscale(0%); }
     .hero-eyebrow {
       display: flex;
       align-items: center;
@@ -238,28 +275,114 @@
     .summary-text { font-size: 1rem; color: var(--text-soft); max-width: 680px; line-height: 1.85; }
 
     /* ── SKILLS ── */
+    /* ── SKILLS REDESIGN ── */
+    .skills-intro {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+      letter-spacing: .04em;
+    }
     .skills-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
     }
-    .skill-card { background: var(--bg-card); padding: 1.5rem 1.4rem; transition: background .2s; }
-    .skill-card:hover { background: var(--bg-raised); }
+    .skill-card {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem 1.6rem 1.6rem;
+      overflow: hidden;
+      transition: border-color .25s, transform .25s, box-shadow .25s;
+      cursor: default;
+    }
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(201,168,76,.04) 0%, transparent 60%);
+      pointer-events: none;
+      transition: opacity .3s;
+      opacity: 0;
+    }
+    .skill-card:hover::before { opacity: 1; }
+    .skill-card:hover {
+      border-color: rgba(201,168,76,.35);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,.35), 0 0 0 1px rgba(201,168,76,.1);
+    }
+    .skill-card:nth-child(3n+1):hover { border-color: rgba(201,168,76,.35); }
+    .skill-card:nth-child(3n+2):hover { border-color: rgba(45,212,191,.35); }
+    .skill-card:nth-child(3n+2)::before {
+      background: linear-gradient(135deg, rgba(45,212,191,.04) 0%, transparent 60%);
+    }
+    .skill-card:nth-child(3n+2) .skill-accent { background: var(--teal); }
+    .skill-card:nth-child(3n+2) .skill-card-label { color: var(--teal); }
+    .skill-card:nth-child(3n+2) .skill-pill { border-color: rgba(45,212,191,.2); color: rgba(45,212,191,.8); }
+    /* glyph backdrop */
+    .skill-glyph {
+      position: absolute;
+      top: .85rem;
+      right: 1rem;
+      font-size: 3.2rem;
+      line-height: 1;
+      opacity: .055;
+      user-select: none;
+      pointer-events: none;
+      font-family: var(--display);
+      transition: opacity .3s;
+    }
+    .skill-card:hover .skill-glyph { opacity: .09; }
+    /* accent bar */
+    .skill-accent {
+      width: 28px;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+      margin-bottom: 1rem;
+    }
     .skill-card-label {
-      font-size: 0.65rem;
-      font-weight: 600;
-      letter-spacing: .12em;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: .14em;
       text-transform: uppercase;
       color: var(--gold);
-      margin-bottom: .85rem;
+      margin-bottom: 1.1rem;
     }
-    .skill-card ul { list-style: none; display: flex; flex-direction: column; gap: .4rem; }
-    .skill-card li { font-size: 0.85rem; color: var(--text-soft); }
-    .skill-card li::before { content: '–  '; color: var(--text-muted); }
+    /* skill pills */
+    .skill-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+    }
+    .skill-pill {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: rgba(201,168,76,.75);
+      background: rgba(201,168,76,.06);
+      border: 1px solid rgba(201,168,76,.18);
+      padding: .3rem .75rem;
+      border-radius: 20px;
+      letter-spacing: .02em;
+      transition: background .2s, border-color .2s, color .2s;
+    }
+    .skill-card:hover .skill-pill {
+      background: rgba(201,168,76,.1);
+      border-color: rgba(201,168,76,.3);
+      color: rgba(201,168,76,.95);
+    }
+    .skill-card:nth-child(3n+2):hover .skill-pill {
+      background: rgba(45,212,191,.1);
+      border-color: rgba(45,212,191,.3);
+      color: rgba(45,212,191,.95);
+    }
+    @media (max-width: 700px) {
+      .skills-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 440px) {
+      .skills-grid { grid-template-columns: 1fr; }
+    }
 
     /* ── EXPERIENCE ── */
     .exp-company {
@@ -451,9 +574,12 @@
         0 0 36px 8px rgba(255,255,255,0.09);
     }
     .carousel-viewport {
-      display: flex;
       overflow: hidden;
       width: 100%;
+    }
+    .carousel-track {
+      display: flex;
+      will-change: transform;
     }
     .carousel-viewport img {
       min-width: 100%;
@@ -510,6 +636,22 @@
     .carousel-dot.active {
       background: var(--gold);
       transform: scale(1.25);
+    }
+
+    /* ── ROAMING DOGS ── */
+    .dogs-layer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 150px;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    #dogsCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
     }
 
     /* ── FOOTER ── */
@@ -590,6 +732,8 @@
     /* ── RESPONSIVE ── */
     @media (max-width: 640px) {
       .hero-grid    { grid-template-columns: 1fr; }
+      .hero-photo-col { align-items: flex-start; flex-direction: row; flex-wrap: wrap; gap: 1rem; }
+      .hero-photo   { width: 120px; height: 150px; }
       .hero-contact { align-items: flex-start; }
       .contact-item { text-align: left; }
       .edu-stat     { text-align: left; }
@@ -611,7 +755,7 @@
       <li><a onclick="showPage('experience')" id="nav-experience">Experience</a></li>
       <li><a onclick="showPage('skills')"     id="nav-skills">Skills</a></li>
       <li><a onclick="showPage('education')"  id="nav-education">Education</a></li>
-      <li><a onclick="showPage('works')" id="nav-works">Portfolio</a></li>
+      <!-- <li><a onclick="showPage('works')" id="nav-works">Portfolio</a></li> -->
       <li><a onclick="openModal('resume')" id="nav-resume">Resume</a></li>
     </ul>
   </div>
@@ -638,18 +782,25 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="opacity:.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           </div>
         </div>
-        <div class="hero-contact">
-          <div class="contact-item">
-            <div class="contact-label">Email</div>
-            <a href="mailto:anchana.professional@gmail.com">anchana.professional@gmail.com</a>
+        <div class="hero-photo-col">
+          <div class="hero-photo-wrap">
+            <img src="Images/Anchu.jpg" alt="Anchana Prabakaran" class="hero-photo" />
           </div>
-          <div class="contact-item">
-            <div class="contact-label">LinkedIn</div>
-            <a href="https://www.linkedin.com/in/anchana-prabakaran-231331233" target="_blank" rel="noopener">anchana-prabakaran ↗</a>
+          <div class="hero-contact">
+            <div class="contact-item">
+              <div class="contact-label">Email</div>
+              <a href="mailto:anchana.professional@gmail.com">anchana.professional@gmail.com</a>
+            </div>
+            <div class="contact-item">
+              <div class="contact-label">LinkedIn</div>
+              <a href="https://www.linkedin.com/in/anchana-prabakaran-231331233" target="_blank" rel="noopener">anchana-prabakaran ↗</a>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <!-- roaming dogs -->
+    <div class="dogs-layer" id="dogsLayer"><canvas id="dogsCanvas"></canvas></div>
   </header>
 
   <section>
@@ -763,30 +914,73 @@
         <div class="eyebrow-rule"></div>
       </div>
       <div class="skills-grid">
+
         <div class="skill-card">
+          <span class="skill-glyph">⬡</span>
+          <div class="skill-accent"></div>
           <div class="skill-card-label">Data Platforms</div>
-          <ul><li>Databricks</li><li>SQL Server</li><li>Azure DevOps</li></ul>
+          <div class="skill-pills">
+            <span class="skill-pill">Databricks</span>
+            <span class="skill-pill">SQL Server</span>
+            <span class="skill-pill">Azure DevOps</span>
+          </div>
         </div>
+
         <div class="skill-card">
+          <span class="skill-glyph">◈</span>
+          <div class="skill-accent"></div>
           <div class="skill-card-label">Reporting</div>
-          <ul><li>Power BI</li><li>SSRS</li><li>DAX</li></ul>
+          <div class="skill-pills">
+            <span class="skill-pill">Power BI</span>
+            <span class="skill-pill">SSRS</span>
+            <span class="skill-pill">DAX</span>
+          </div>
         </div>
+
         <div class="skill-card">
+          <span class="skill-glyph">⟨/⟩</span>
+          <div class="skill-accent"></div>
           <div class="skill-card-label">Languages</div>
-          <ul><li>Python</li><li>T-SQL</li><li>DAX</li></ul>
+          <div class="skill-pills">
+            <span class="skill-pill">Python</span>
+            <span class="skill-pill">T-SQL</span>
+            <span class="skill-pill">DAX</span>
+          </div>
         </div>
+
         <div class="skill-card">
+          <span class="skill-glyph">⇄</span>
+          <div class="skill-accent"></div>
           <div class="skill-card-label">ETL &amp; Pipelines</div>
-          <ul><li>DBT</li><li>ETL Transformations</li><li>CI/CD Pipelines</li></ul>
+          <div class="skill-pills">
+            <span class="skill-pill">DBT</span>
+            <span class="skill-pill">ETL Transformations</span>
+            <span class="skill-pill">CI/CD Pipelines</span>
+          </div>
         </div>
+
         <div class="skill-card">
+          <span class="skill-glyph">⌁</span>
+          <div class="skill-accent"></div>
           <div class="skill-card-label">Integration</div>
-          <ul><li>ODBC</li><li>Simba Spark Driver</li><li>PAT Authentication</li></ul>
+          <div class="skill-pills">
+            <span class="skill-pill">ODBC</span>
+            <span class="skill-pill">Simba Spark Driver</span>
+            <span class="skill-pill">PAT Authentication</span>
+          </div>
         </div>
+
         <div class="skill-card">
+          <span class="skill-glyph">☁</span>
+          <div class="skill-accent"></div>
           <div class="skill-card-label">Cloud &amp; DevOps</div>
-          <ul><li>Azure DevOps</li><li>Version Control</li><li>Pipeline Management</li></ul>
+          <div class="skill-pills">
+            <span class="skill-pill">Azure DevOps</span>
+            <span class="skill-pill">Version Control</span>
+            <span class="skill-pill">Pipeline Management</span>
+          </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -831,11 +1025,13 @@
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
         </button>
         <div class="carousel-viewport" id="carouselViewport">
-          <img src="Carousel1/Assertive_Communication_Skills_Masterclass.jpg" alt="Assertive Communication Skills Masterclass">
-          <img src="Carousel1/Generative_AI_For_Data_Engineering_And_Data_Professional.jpg" alt="Generative AI For Data Engineering">
-          <img src="Carousel1/Intro_to_AI_Agents_And_Agentic_AI.jpg" alt="Intro to AI Agents And Agentic AI">
-          <img src="Carousel1/Introduction_To_Data_Engineering_Using_Generative_AI.jpg" alt="Introduction To Data Engineering Using Generative AI">
-          <img src="Carousel1/RAG_Strategy_And_Execution.jpg" alt="RAG Strategy And Execution">
+          <div class="carousel-track" id="carouselTrack">
+            <img src="Carousel1/Assertive_Communication_Skills_Masterclass.jpg" alt="Assertive Communication Skills Masterclass">
+            <img src="Carousel1/Generative_AI_For_Data_Engineering_And_Data_Professional.jpg" alt="Generative AI For Data Engineering">
+            <img src="Carousel1/Intro_to_AI_Agents_And_Agentic_AI.jpg" alt="Intro to AI Agents And Agentic AI">
+            <img src="Carousel1/Introduction_To_Data_Engineering_Using_Generative_AI.jpg" alt="Introduction To Data Engineering Using Generative AI">
+            <img src="Carousel1/RAG_Strategy_And_Execution.jpg" alt="RAG Strategy And Execution">
+          </div>
         </div>
         <button class="carousel-btn next" id="carouselNext" aria-label="Next">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
@@ -848,7 +1044,7 @@
 
 
 
-<div class="page" id="page-works">
+<!-- <div class="page" id="page-works">
   <section style="border-bottom:none;">
     <div class="wrap">
       <div class="section-header">
@@ -863,7 +1059,7 @@
       </div>
     </div>
   </section>
-</div>
+</div> -->
 
 
 <!-- FOOTER -->
@@ -973,85 +1169,401 @@
     if (e.target === document.getElementById('docModal')) closeModal();
   }
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeModal();
-  });
+  /* roundRect polyfill for older browsers */
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+      this.beginPath();
+      this.moveTo(x+r,y);
+      this.lineTo(x+w-r,y);
+      this.quadraticCurveTo(x+w,y,x+w,y+r);
+      this.lineTo(x+w,y+h-r);
+      this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+      this.lineTo(x+r,y+h);
+      this.quadraticCurveTo(x,y+h,x,y+h-r);
+      this.lineTo(x,y+r);
+      this.quadraticCurveTo(x,y,x+r,y);
+      this.closePath();
+    };
+  }
+
+  /* ── ANIMATED CANVAS DOGS ── */
+  (function() {
+    var canvas = document.getElementById('dogsCanvas');
+    var layer  = document.getElementById('dogsLayer');
+    if (!canvas || !layer) return;
+    var ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width  = layer.offsetWidth  || window.innerWidth;
+      canvas.height = layer.offsetHeight || 90;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    /* ── Draw one dog at (0,0) facing right, scale 1
+       Dog is ~44px wide, ~30px tall at scale=1
+       violet stroke: #a78bfa, no fill (outline only)
+    ── */
+    function drawDog(legPhase, sitting, facing) {
+      var c = ctx;
+      c.save();
+      if (facing === -1) { c.scale(-1, 1); }
+
+      var S = '#a78bfa'; // violet
+      c.strokeStyle = S;
+      c.lineWidth   = 1.8;
+      c.lineCap     = 'round';
+      c.lineJoin    = 'round';
+
+      if (sitting) {
+        /* ── SITTING DOG ── */
+        // body (oval)
+        c.beginPath();
+        c.ellipse(0, -14, 12, 9, -0.2, 0, Math.PI*2);
+        c.stroke();
+
+        // head
+        c.beginPath();
+        c.ellipse(15, -19, 8, 7, 0.1, 0, Math.PI*2);
+        c.stroke();
+
+        // ear (floppy)
+        c.beginPath();
+        c.moveTo(13, -24);
+        c.bezierCurveTo(18, -29, 24, -26, 22, -19);
+        c.stroke();
+
+        // eye
+        c.beginPath();
+        c.arc(18, -20, 1.2, 0, Math.PI*2);
+        c.fillStyle = S;
+        c.fill();
+
+        // nose
+        c.beginPath();
+        c.arc(23, -18, 1, 0, Math.PI*2);
+        c.fill();
+
+        // tail (up curled)
+        c.beginPath();
+        c.moveTo(-10, -14);
+        c.bezierCurveTo(-20, -14, -22, -28, -14, -28);
+        c.stroke();
+
+        // front legs (folded)
+        c.beginPath();
+        c.moveTo(6, -6);  c.lineTo(6, 4);
+        c.moveTo(2, -6);  c.lineTo(2, 4);
+        c.stroke();
+
+        // back haunches
+        c.beginPath();
+        c.moveTo(-8, -6);
+        c.bezierCurveTo(-8, 0, -4, 4, -2, 4);
+        c.moveTo(-12, -6);
+        c.bezierCurveTo(-12, 0, -8, 4, -6, 4);
+        c.stroke();
+
+      } else {
+        /* ── RUNNING DOG ── */
+        var t = legPhase; // 0..1 running cycle
+        var bounce = Math.sin(t * Math.PI * 2) * 2; // body bob
+
+        // body
+        c.beginPath();
+        c.ellipse(0, -14 + bounce, 14, 8, 0, 0, Math.PI*2);
+        c.stroke();
+
+        // neck
+        c.beginPath();
+        c.moveTo(10, -20 + bounce);
+        c.lineTo(16, -24 + bounce);
+        c.stroke();
+
+        // head
+        c.beginPath();
+        c.ellipse(21, -26 + bounce, 8, 6, 0.3, 0, Math.PI*2);
+        c.stroke();
+
+        // ear (flapping with run)
+        var earFlap = Math.sin(t * Math.PI * 4) * 4;
+        c.beginPath();
+        c.moveTo(18, -30 + bounce);
+        c.bezierCurveTo(22, -36 + bounce + earFlap, 28, -33 + bounce, 27, -27 + bounce);
+        c.stroke();
+
+        // eye
+        c.beginPath();
+        c.arc(25, -27 + bounce, 1.2, 0, Math.PI*2);
+        c.fillStyle = S;
+        c.fill();
+
+        // nose
+        c.beginPath();
+        c.arc(29, -25 + bounce, 1, 0, Math.PI*2);
+        c.fill();
+
+        // tail (wagging)
+        var wag = Math.sin(t * Math.PI * 4) * 10;
+        c.beginPath();
+        c.moveTo(-12, -14 + bounce);
+        c.bezierCurveTo(-20, -14 + bounce, -25, -20 + bounce + wag, -22, -26 + bounce + wag);
+        c.stroke();
+
+        // LEGS — 4 legs, alternating pairs
+        var a1 = Math.sin(t * Math.PI * 2);       // front pair phase
+        var a2 = Math.sin(t * Math.PI * 2 + Math.PI); // back pair phase
+
+        var gnd = -6 + bounce; // ground reference
+
+        // front-left leg
+        var fl1x = 6,  fl1y = gnd;
+        var fl1ex = fl1x + a1 * 8,  fl1ey = fl1y + Math.abs(a1) * 10;
+        c.beginPath();
+        c.moveTo(fl1x, fl1y);
+        c.quadraticCurveTo(fl1x + a1*4, fl1y + 6, fl1ex, fl1ey);
+        c.stroke();
+
+        // front-right leg
+        var fr1x = 10, fr1y = gnd;
+        var fr1ex = fr1x - a1 * 8, fr1ey = fr1y + Math.abs(a1) * 10;
+        c.beginPath();
+        c.moveTo(fr1x, fr1y);
+        c.quadraticCurveTo(fr1x - a1*4, fr1y + 6, fr1ex, fr1ey);
+        c.stroke();
+
+        // back-left leg
+        var bl1x = -8,  bl1y = gnd;
+        var bl1ex = bl1x + a2 * 9,  bl1ey = bl1y + Math.abs(a2) * 10;
+        c.beginPath();
+        c.moveTo(bl1x, bl1y);
+        c.quadraticCurveTo(bl1x + a2*4, bl1y + 6, bl1ex, bl1ey);
+        c.stroke();
+
+        // back-right leg
+        var br1x = -12, br1y = gnd;
+        var br1ex = br1x - a2 * 9, br1ey = br1y + Math.abs(a2) * 10;
+        c.beginPath();
+        c.moveTo(br1x, br1y);
+        c.quadraticCurveTo(br1x - a2*4, br1y + 6, br1ex, br1ey);
+        c.stroke();
+      }
+
+      c.restore();
+    }
+
+    /* ── Draw "oof" speech bubble above dog ── */
+    function drawBubble(text) {
+      var c = ctx;
+      c.save();
+      var W2 = text.length * 7 + 16;
+      var H2 = 22;
+      // bubble body
+      c.fillStyle   = 'rgba(20,20,30,0.85)';
+      c.strokeStyle = '#a78bfa';
+      c.lineWidth   = 1.5;
+      c.beginPath();
+      c.roundRect(-W2/2, -H2 - 6, W2, H2, 5);
+      c.fill(); c.stroke();
+      // tail pointer
+      c.beginPath();
+      c.moveTo(-4, -6);
+      c.lineTo(4, -6);
+      c.lineTo(0, 0);
+      c.closePath();
+      c.fill(); c.stroke();
+      // text
+      c.fillStyle = '#e8eaf0';
+      c.font      = 'bold 10px Inter, sans-serif';
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.fillText(text, 0, -H2/2 - 6);
+      c.restore();
+    }
+
+    /* ── Dog state ── */
+    var DOG_COUNT = 4;
+    var dogs = [];
+    var W = canvas.width;
+    var GY = canvas.height - 12; // ground y
+
+    var bubbleTexts = ['oof','woof','bork','ruff','yip'];
+
+    for (var i = 0; i < DOG_COUNT; i++) {
+      var dir = (Math.random() < 0.5) ? 1 : -1;
+      dogs.push({
+        x: Math.random() * W,
+        dir: dir,
+        speed: 0.8 + Math.random() * 0.9,
+        legPhase: Math.random(),
+        scale: 0.9 + Math.random() * 0.45,
+        pauseTimer: 0,
+        sitting: false,
+        bubbleTimer: 0,
+        bubbleText: '',
+        nextPause: 200 + Math.floor(Math.random() * 400)
+      });
+    }
+
+    var frame = 0;
+
+    function tick() {
+      W = canvas.width;
+      ctx.clearRect(0, 0, W, canvas.height);
+
+      dogs.forEach(function(d) {
+        frame++;
+
+        if (d.pauseTimer > 0) {
+          d.pauseTimer--;
+          d.sitting = true;
+          // show bubble
+          if (d.bubbleTimer > 0) {
+            d.bubbleTimer--;
+          } else if (d.pauseTimer > 60 && d.bubbleText === '') {
+            d.bubbleText  = bubbleTexts[Math.floor(Math.random() * bubbleTexts.length)];
+            d.bubbleTimer = 60;
+          }
+          if (d.pauseTimer === 0) {
+            d.sitting    = false;
+            d.bubbleText = '';
+            d.nextPause  = 200 + Math.floor(Math.random() * 500);
+          }
+        } else {
+          d.sitting = false;
+          d.bubbleText = '';
+          d.x += d.speed * d.dir;
+          d.legPhase = (d.legPhase + 0.035) % 1;
+
+          // wrap
+          if (d.x > W + 60)  d.x = -60;
+          if (d.x < -60)     d.x = W + 60;
+
+          d.nextPause--;
+          if (d.nextPause <= 0) {
+            d.pauseTimer = 80 + Math.floor(Math.random() * 120);
+          }
+        }
+
+        ctx.save();
+        ctx.translate(d.x, GY);
+        ctx.scale(d.scale, d.scale);
+
+        // bubble
+        if (d.bubbleText && d.bubbleTimer > 0) {
+          ctx.save();
+          ctx.translate(d.dir === 1 ? 10 : -10, -45);
+          drawBubble(d.bubbleText);
+          ctx.restore();
+        }
+
+        drawDog(d.legPhase, d.sitting, d.dir);
+        ctx.restore();
+      });
+
+      requestAnimationFrame(tick);
+    }
+
+    requestAnimationFrame(tick);
+  })();
+
 
   /* ── CAROUSEL ── */
   (function () {
     var viewport = document.getElementById('carouselViewport');
+    var track    = document.getElementById('carouselTrack');
     var wrap     = document.getElementById('carouselWrap');
     var dotsBar  = document.getElementById('carouselDots');
     var btnPrev  = document.getElementById('carouselPrev');
     var btnNext  = document.getElementById('carouselNext');
-    if (!viewport) return;
+    if (!viewport || !track) return;
 
-    var slides  = Array.from(viewport.querySelectorAll('img'));
-    var total   = slides.length;
-    var current = 0;
-    var paused  = false;
-    var timer   = null;
+    var slides   = Array.from(track.querySelectorAll('img'));
+    var total    = slides.length;
+    var current  = 0;
+    var paused   = false;
+    var animating = false;
+    var timer    = null;
 
     /* Build dots */
     slides.forEach(function (_, i) {
       var dot = document.createElement('button');
       dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
       dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
-      dot.addEventListener('click', function () { goTo(i); });
+      dot.addEventListener('click', function () { if (!animating) slideTo(i); });
       dotsBar.appendChild(dot);
     });
 
     function updateDots() {
-      var dots = dotsBar.querySelectorAll('.carousel-dot');
-      dots.forEach(function (d, i) {
+      dotsBar.querySelectorAll('.carousel-dot').forEach(function (d, i) {
         d.classList.toggle('active', i === current);
       });
     }
 
-    /* Instantly jump the flex strip — no CSS transitions involved,
-       so there is nothing to "get stuck". */
-    function goTo(index) {
-      current = (index + total) % total;   /* wrap around */
-      var slideW = viewport.offsetWidth;
-      /* Use scrollLeft — supported everywhere, no transition bugs */
-      viewport.style.transition = 'none';
-      /* Temporarily make viewport scrollable, jump, then lock again */
-      viewport.style.overflowX = 'scroll';
-      viewport.scrollLeft = current * slideW;
-      viewport.style.overflowX = 'hidden';
-      updateDots();
+    /* Position track instantly (no animation) */
+    function setTrackPos(index) {
+      track.style.transition = 'none';
+      track.style.transform  = 'translateX(' + (-index * 100) + '%)';
     }
 
-    /* Smooth animated slide using a quick CSS transition on the flex strip */
+    /* Animate from current → next with true infinite wrap */
     function slideTo(index) {
-      var next = (index + total) % total;
-      var slideW = viewport.offsetWidth;
+      if (animating) return;
+      var next = ((index % total) + total) % total;
+      if (next === current) return;
+      animating = true;
 
-      /* Move track with CSS animation */
-      viewport.style.overflowX = 'hidden';
-      /* Animate by transitioning scrollLeft via JS frame loop */
-      var start    = viewport.scrollLeft;
-      /* We need to set scrollLeft on a scrollable element.
-         Temporarily allow scroll, animate, then lock. */
-      viewport.style.overflowX = 'scroll';
-      var end      = next * slideW;
-      var startT   = null;
-      var duration = 500;
+      var slideW = viewport.offsetWidth;
+      var goingForward = (next === (current + 1) % total) ||
+                         (current === total - 1 && next === 0);
+
+      /* For a seamless wrap we use a clone trick:
+         clone the destination slide, position it just off-screen in the
+         direction of travel, animate both track position and the clone,
+         then snap to the real slide when done. */
+      var clone = slides[next].cloneNode(true);
+      clone.style.position = 'absolute';
+      clone.style.top      = '0';
+      clone.style.width    = '100%';
+      clone.style.height   = '100%';
+      clone.style.objectFit = 'contain';
+      clone.style.background = 'var(--bg-card)';
+      clone.style.pointerEvents = 'none';
+      clone.style.userSelect = 'none';
+      clone.style.transition = 'none';
+      clone.style.left = goingForward ? '100%' : '-100%';
+
+      viewport.style.position = 'relative';
+      viewport.appendChild(clone);
+
+      /* Animate track out and clone in */
+      var trackStart  = -current * 100;        /* % units */
+      var trackEnd    = goingForward ? trackStart - 100 : trackStart + 100;
+      var cloneStart  = parseFloat(clone.style.left);
+      var startT      = null;
+      var duration    = 480;
 
       function step(ts) {
         if (!startT) startT = ts;
         var prog = Math.min((ts - startT) / duration, 1);
-        /* ease-in-out */
+        /* ease-in-out cubic */
         var ease = prog < 0.5
-          ? 2 * prog * prog
-          : -1 + (4 - 2 * prog) * prog;
-        viewport.scrollLeft = start + (end - start) * ease;
+          ? 4 * prog * prog * prog
+          : 1 - Math.pow(-2 * prog + 2, 3) / 2;
+
+        track.style.transition = 'none';
+        track.style.transform  = 'translateX(' + (trackStart + (trackEnd - trackStart) * ease) + '%)';
+        clone.style.left       = (cloneStart + (0 - cloneStart) * ease) + '%';
+
         if (prog < 1) {
           requestAnimationFrame(step);
         } else {
+          /* Snap real track to the destination, remove clone */
           current = next;
-          viewport.scrollLeft = end;
-          viewport.style.overflowX = 'hidden';
+          setTrackPos(current);
+          viewport.removeChild(clone);
+          viewport.style.position = '';
+          animating = false;
           updateDots();
         }
       }
@@ -1064,7 +1576,7 @@
     /* Auto-advance every 2 s */
     function startTimer() {
       timer = setInterval(function () {
-        if (!paused) slideTo(current + 1);
+        if (!paused && !animating) slideTo(current + 1);
       }, 2000);
     }
 
@@ -1073,7 +1585,8 @@
     wrap.addEventListener('mouseleave', function () { paused = false; });
 
     /* Init */
-    goTo(0);
+    setTrackPos(0);
+    updateDots();
     startTimer();
   })();
 </script>
