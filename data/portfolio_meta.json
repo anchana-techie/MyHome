@@ -1,0 +1,107 @@
+[
+  {
+    "id": "profile",
+    "title": "Profile Summary",
+    "text": "Anchana Prabakaran is a Data Analyst based in Chennai, India, with 2+ years of experience engineering data pipelines, migrating hundreds of SSRS reports to Databricks, and delivering Power BI dashboards that drive business decisions. She is comfortable across the full data stack: converting T-SQL to Databricks-compatible SQL, configuring ODBC connectors, and deploying DBT models through Azure DevOps CI/CD. She holds an active Databricks Certified Data Engineer Associate certification."
+  },
+  {
+    "id": "contact",
+    "title": "Contact Information",
+    "text": "Email: anchana.professional@gmail.com. LinkedIn: linkedin.com/in/anchana-prabakaran-231331233. Based in Chennai, India."
+  },
+  {
+    "id": "certification",
+    "title": "Databricks Certification",
+    "text": "Anchana holds the Databricks Certified Data Engineer Associate certification, issued June 1, 2026 and valid until June 1, 2028. It is currently active."
+  },
+  {
+    "id": "project_powerbi",
+    "title": "Project: Power BI Dashboard Development",
+    "text": "Anchana designed and delivered multiple Power BI dashboards for business stakeholders, including Portfolio at Risk, Agent Productivity, Claims, and Insurance dashboards. She developed DAX measures and data models to support dynamic reporting and KPI tracking, and collaborated with business teams to gather requirements and translate them into actionable visual analytics."
+  },
+  {
+    "id": "project_ssrs_migration",
+    "title": "Project: SSRS-to-Databricks Migration (200-400 Reports)",
+    "text": "Anchana led an end-to-end migration of 200 to 400 SSRS reports from SQL Server to Databricks, converting embedded T-SQL to Databricks-compatible SQL. She automated extraction of table references and T-SQL queries from .rdl files using Python scripting, significantly reducing manual effort. She configured ODBC connectivity via the Simba Spark Driver and Databricks Personal Access Tokens to repoint reports to the new platform, validated query outputs between SQL Server and Databricks, classified discrepancies as data sync or logic issues, and resolved them to ensure accuracy post-migration."
+  },
+  {
+    "id": "project_etl_dbt",
+    "title": "Project: ETL Pipeline Development & DBT Deployment on Azure DevOps",
+    "text": "Anchana designed and implemented ETL transformation logic in Databricks to process and structure raw data for downstream consumption. She packaged and deployed ETL scripts as DBT models through Azure DevOps CI/CD pipelines, ensuring transformation logic adhered to data quality standards with full version control in the DevOps repository."
+  },
+  {
+    "id": "skills",
+    "title": "Technical Skills",
+    "text": "Data Platforms: Databricks, SQL Server, Azure DevOps. Reporting: Power BI, SSRS, DAX. Languages: Python, T-SQL, DAX. ETL & Pipelines: DBT, ETL transformations, CI/CD pipelines. Integration: ODBC, Simba Spark Driver, PAT authentication. Cloud & DevOps: Azure DevOps, version control, pipeline management."
+  },
+  {
+    "id": "education",
+    "title": "Education",
+    "text": "B.E. in Computer Science & Engineering from Meenakshi Sundararajan Engineering College, graduating First Class with Distinction with a CGPA of 8.84."
+  },
+  {
+    "id": "course_certifications",
+    "title": "Additional Course Certifications",
+    "text": "Anchana has completed course certifications in: Assertive Communication Skills Masterclass, Generative AI For Data Engineering, Intro to AI Agents and Agentic AI, Introduction to Data Engineering Using Generative AI, and RAG Strategy and Execution."
+  },
+  {
+    "id": "resume",
+    "title": "Resume",
+    "text": "Anchana's resume is available on her portfolio site under the Resume section, viewable directly or downloadable as a document."
+  },
+  {
+    "id": "beyond_work_overview",
+    "title": "Beyond Work",
+    "text": "Outside of her professional work, Anchana dedicates time to creative and physical pursuits that help her recharge. Her hobbies include painting and sketching, badminton, clay sculpting and pottery, and table tennis, each offering a different way to unwind and stay engaged beyond data and dashboards."
+  },
+  {
+    "id": "beyond_work_art",
+    "title": "Beyond Work: Art & Painting",
+    "text": "Drawing and painting give Anchana a quiet, creative outlet away from screens and spreadsheets. She enjoys experimenting with sketching, colour, and mixed media in her free time, and some of her artwork has been recognized in IGOT painting competitions."
+  },
+  {
+    "id": "beyond_work_badminton",
+    "title": "Beyond Work: Badminton",
+    "text": "Badminton is a racquet sport Anchana picked up as a way to stay active and sharpen her reflexes. She plays regularly with friends and colleagues on weekends, finding it a fast-paced, competitive way to relieve stress, and has taken part in tournaments."
+  },
+  {
+    "id": "beyond_work_clay_sculpting",
+    "title": "Beyond Work: Clay Sculpting",
+    "text": "Clay sculpting and pottery are a hands-on, tactile craft Anchana turns to when she wants to slow down and make something with her hands. She enjoys shaping and moulding clay into functional pieces such as vases and flasks, as well as smaller painted pieces."
+  },
+  {
+    "id": "beyond_work_table_tennis",
+    "title": "Beyond Work: Table Tennis",
+    "text": "Table tennis is one of Anchana's favourite ways to unwind, combining quick reflexes with friendly competition. She plays regularly with friends and family and has earned recognition in table tennis competitions, including a silver medal."
+  },
+  {
+    "id": "csr_overview",
+    "title": "CSR & Community Service",
+    "text": "Anchana is actively involved in corporate social responsibility (CSR) initiatives, taking part in community service activities focused on environmental sustainability and support for underprivileged communities. Her CSR involvement spans tree plantation drives, breakfast drives, educational and hygiene kit packaging, seed ball making, and school painting projects."
+  },
+  {
+    "id": "csr_tree_plantation",
+    "title": "CSR: Tree Plantation Drive",
+    "text": "Anchana joined a community tree-plantation initiative aimed at increasing green cover in local neighbourhoods and raising awareness about environmental sustainability."
+  },
+  {
+    "id": "csr_breakfast_drive",
+    "title": "CSR: Breakfast Drive",
+    "text": "Anchana participated in a breakfast drive to support underprivileged communities, helping ensure they have access to nutritious meals."
+  },
+  {
+    "id": "csr_education_hygiene_kits",
+    "title": "CSR: Education and Hygiene Kit Packaging",
+    "text": "Anchana assisted in packaging educational and hygiene kits for distribution to underprivileged communities, supporting access to essential school and hygiene supplies."
+  },
+  {
+    "id": "csr_seed_ball_making",
+    "title": "CSR: Seed Ball Making",
+    "text": "Anchana took part in a seed ball making workshop, an initiative promoting environmental conservation and sustainable gardening practices."
+  },
+  {
+    "id": "csr_school_painting",
+    "title": "CSR: School Painting",
+    "text": "Anchana contributed to a school painting initiative aimed at enhancing the learning environment and promoting creativity among students."
+  }
+]
