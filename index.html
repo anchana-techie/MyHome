@@ -25,7 +25,6 @@
       --project-hover: #13151d;
       --carousel-btn-bg: rgba(10,11,14,0.70);
       --modal-overlay: rgba(0,0,0,0.82);
-      --dog-bubble-bg: rgba(20,20,30,0.85);
       --canvas-text:  #e8eaf0;
       --shadow-strong: rgba(0,0,0,0.7);
       --display:     'DM Serif Display', Georgia, serif;
@@ -51,7 +50,6 @@
       --project-hover: #f3eee4;
       --carousel-btn-bg: rgba(255,255,255,0.78);
       --modal-overlay: rgba(32,35,42,0.55);
-      --dog-bubble-bg: rgba(255,255,255,0.9);
       --canvas-text:  #20232a;
       --shadow-strong: rgba(47,42,31,0.22);
     }
@@ -928,20 +926,17 @@
       transform: scale(1.25);
     }
 
-    /* ── ROAMING DOGS ── */
-    .dogs-layer {
-      position: absolute;
-      bottom: 0;
-      left: 0;
+    /* ── STICK STORY (day-in-the-life hero strip) ── */
+    .stick-story-layer {
+      position: relative;
       width: 100%;
-      height: 150px;
-      pointer-events: none;
+      margin-top: clamp(2.5rem, 6vw, 4rem);
+      background: #0a0a12;
       overflow: hidden;
     }
-    #dogsCanvas {
+    #stickStoryCanvas {
       display: block;
       width: 100%;
-      height: 100%;
     }
 
     /* ── FOOTER ── */
@@ -1225,7 +1220,7 @@
     <span class="nav-logo" onclick="showPage('home')">Anchana Prabakaran</span>
     <div class="nav-actions">
       <ul>
-        <li><a onclick="showPage('YearExperience')" id="nav-works">Experience</a></li>
+        <li><a onclick="showPage('YearExperience')" id="nav-YearExperience">Experience</a></li>
         <li><a onclick="showPage('experience')" id="nav-experience">Projects</a></li>
         <li><a onclick="showPage('skills')"     id="nav-skills">Skills</a></li>
         <li><a onclick="showPage('education')"  id="nav-education">Education</a></li>
@@ -1282,8 +1277,8 @@
         </div>
       </div>
     </div>
-    <!-- roaming dogs -->
-    <div class="dogs-layer" id="dogsLayer"><canvas id="dogsCanvas"></canvas></div>
+    <!-- stick story: day-in-the-life animated strip -->
+    <div class="stick-story-layer" id="stickStoryLayer"><canvas id="stickStoryCanvas"></canvas></div>
   </header>
 
   <section>
@@ -1767,288 +1762,586 @@
     };
   }
 
-  /* ── ANIMATED CANVAS DOGS ── */
-  (function() {
-    var canvas = document.getElementById('dogsCanvas');
-    var layer  = document.getElementById('dogsLayer');
-    if (!canvas || !layer) return;
-    var ctx = canvas.getContext('2d');
+  /* ── STICK STORY (day-in-the-life hero animation) ── */
+  (function(){
+const canvas = document.getElementById('stickStoryCanvas');
+if (!canvas) return;
+const layer = document.getElementById('stickStoryLayer');
+const ctx = canvas.getContext('2d');
 
-    function resize() {
-      canvas.width  = layer.offsetWidth  || window.innerWidth;
-      canvas.height = layer.offsetHeight || 90;
+const BG_W = 1400, BG_H = 380;
+const GROUND_Y = 320; // the floor line every standing figure's feet touch
+
+// Full-bleed, aspect-correct resize: the strip always fills the container's
+// actual width (never letterboxed/cropped) and stays crisp at any screen size.
+function resize(){
+  const w = layer.clientWidth;
+  const scale = w / BG_W;
+  const h = BG_H * scale;
+  layer.style.height = h+'px';
+  canvas.style.width = w+'px';
+  canvas.style.height = h+'px';
+  const dpr = window.devicePixelRatio||1;
+  canvas.width = Math.round(w*dpr);
+  canvas.height = Math.round(h*dpr);
+  ctx.setTransform(scale*dpr,0,0,scale*dpr,0,0);
+}
+window.addEventListener('resize', resize);
+resize();
+
+const COL = {
+  bg:'#0a0a12', line:'#8f7cf0', lineDim:'#5c4fae',
+  girl:'#c7bbfb', partner:'#ffb4d0',
+  accentSun:'#f6c667', accentMoon:'#d9def0',
+  paper:'#efe7ff', ink:'#3a2f66', screen:'#2a2350', code:'#a996ff', shuttle:'#ffffff'
+};
+
+// scene anchor x positions (design space) — all left→right, nothing overlaps
+const SCENES = {
+  bed1:   {x:110, w:150},
+  desk:   {x:300},
+  tt:     {x:520, tableL:470, tableR:650, girlX:430, partnerX:690},
+  easel:  {x:790},
+  pottery:{x:900},
+  bad:    {x:1020, netX:1085, partnerX:1150},
+  bed2:   {x:1280, w:150}
+};
+// derived stopping points for the girl's walk path (matches draw geometry)
+const STOPS = {
+  bed1Foot:  SCENES.bed1.x + SCENES.bed1.w/2 - 30,
+  deskSeat:  SCENES.desk.x - 10,
+  ttSpot:    SCENES.tt.girlX,
+  easelSpot: SCENES.easel.x - 40,
+  potterySpot: SCENES.pottery.x - 34,
+  badSpot:   SCENES.bad.x,
+  bed2Foot:  SCENES.bed2.x + SCENES.bed2.w/2 - 30
+};
+
+let t = 0, sunProgress = 0, moonProgress = 0;
+
+// ---------------- windows ----------------
+function drawWindow(cx, cy, w, h){
+  ctx.strokeStyle = COL.line; ctx.lineWidth = 2;
+  ctx.strokeRect(cx-w/2, cy-h/2, w, h);
+  ctx.beginPath();
+  ctx.moveTo(cx-w/2, cy); ctx.lineTo(cx+w/2, cy);
+  ctx.moveTo(cx, cy-h/2); ctx.lineTo(cx, cy+h/2);
+  ctx.stroke();
+}
+function drawSunWindow(cx, cy, w, h, progress){
+  drawWindow(cx, cy, w, h);
+  ctx.save(); ctx.beginPath(); ctx.rect(cx-w/2, cy-h/2, w, h); ctx.clip();
+  const sy = (cy+h/2) - progress*h*1.1;
+  ctx.fillStyle = COL.accentSun;
+  ctx.beginPath(); ctx.arc(cx-w*0.15, sy, w*0.16, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = COL.accentSun; ctx.lineWidth=1.5;
+  for(let i=0;i<6;i++){
+    const a = i/6*Math.PI*2 + t*0.3;
+    ctx.beginPath();
+    ctx.moveTo(cx-w*0.15+Math.cos(a)*w*0.2, sy+Math.sin(a)*w*0.2);
+    ctx.lineTo(cx-w*0.15+Math.cos(a)*w*0.28, sy+Math.sin(a)*w*0.28);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawMoonWindow(cx, cy, w, h, progress){
+  drawWindow(cx, cy, w, h);
+  ctx.save(); ctx.beginPath(); ctx.rect(cx-w/2, cy-h/2, w, h); ctx.clip();
+  ctx.fillStyle = COL.accentMoon;
+  [[0.3,0.3],[0.7,0.25],[0.55,0.6],[0.2,0.7]].forEach((s,i)=>{
+    const tw = 0.5+0.5*Math.sin(t*3+i);
+    ctx.globalAlpha = Math.min(1,progress*1.5)*tw;
+    ctx.beginPath(); ctx.arc(cx-w/2+s[0]*w, cy-h/2+s[1]*h, 1.6,0,Math.PI*2); ctx.fill();
+  });
+  ctx.globalAlpha=1;
+  const my = (cy+h/2) - progress*h*1.1;
+  ctx.fillStyle = COL.accentMoon;
+  ctx.beginPath(); ctx.arc(cx+w*0.12, my, w*0.15, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = COL.bg;
+  ctx.beginPath(); ctx.arc(cx+w*0.12+w*0.07, my-w*0.03, w*0.13,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+// ---------------- bed (returns surface coords the figure aligns to) ----------------
+function bed(cx, w){
+  const floor=GROUND_Y, bx=cx-w/2, topY=floor-30, botY=floor-2;
+  ctx.strokeStyle=COL.line; ctx.lineWidth=2;
+  ctx.strokeRect(bx, topY+10, w, botY-(topY+10));
+  ctx.beginPath(); ctx.moveTo(bx,topY+10); ctx.lineTo(bx,topY-14); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(bx-4,topY-14); ctx.lineTo(bx+6,topY-14); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(bx+4,botY); ctx.lineTo(bx+4,floor);
+  ctx.moveTo(bx+w-4,botY); ctx.lineTo(bx+w-4,floor);
+  ctx.stroke();
+  const pillowCx=bx+26, pillowCy=topY+14;
+  ctx.beginPath(); ctx.ellipse(pillowCx, pillowCy, 16, 8, 0, 0, Math.PI*2); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(bx+42,topY+18);
+  ctx.quadraticCurveTo(bx+w*0.6, topY+6, bx+w-8, topY+16);
+  ctx.lineTo(bx+w-8, topY+22);
+  ctx.quadraticCurveTo(bx+w*0.6, topY+16, bx+42,topY+22);
+  ctx.stroke();
+  return {pillowCx, pillowCy};
+}
+
+// ---------------- desk + chair ----------------
+function chairAndDesk(cx, codeOffset){
+  const floor=GROUND_Y;
+  ctx.strokeStyle=COL.line; ctx.lineWidth=2;
+  const dx=cx+4, deskTopY=floor-58;
+  ctx.strokeRect(dx, deskTopY, 132, 6);
+  ctx.beginPath();
+  ctx.moveTo(dx+6,deskTopY+6); ctx.lineTo(dx+6,floor);
+  ctx.moveTo(dx+126,deskTopY+6); ctx.lineTo(dx+126,floor);
+  ctx.stroke();
+  // chair (raised so the seated figure lines up with the desktop)
+  const seatX=cx-34, seatY=floor-36, seatW=30;
+  ctx.strokeRect(seatX, seatY, seatW, 5);
+  ctx.beginPath(); ctx.moveTo(seatX, seatY); ctx.lineTo(seatX, seatY-30); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(seatX-2, seatY-30); ctx.lineTo(seatX+2, seatY-2); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(seatX+3,seatY+5); ctx.lineTo(seatX+3,floor);
+  ctx.moveTo(seatX+seatW-3,seatY+5); ctx.lineTo(seatX+seatW-3,floor);
+  ctx.stroke();
+  // laptop with scrolling code — centered on the desk
+  const lx=dx+42, ly=deskTopY-26, lw=48, lh=26;
+  ctx.strokeRect(lx,ly,lw,lh);
+  ctx.beginPath(); ctx.moveTo(lx-4,ly+lh); ctx.lineTo(lx+lw+4,ly+lh); ctx.stroke();
+  ctx.save();
+  ctx.beginPath(); ctx.rect(lx+3,ly+3,lw-6,lh-6); ctx.clip();
+  ctx.fillStyle=COL.screen; ctx.fillRect(lx+3,ly+3,lw-6,lh-6);
+  ctx.strokeStyle=COL.code; ctx.lineWidth=1.5;
+  for(let i=-1;i<8;i++){
+    const yy = ly+3 + ((i*6+codeOffset)%lh);
+    ctx.beginPath(); ctx.moveTo(lx+5,yy); ctx.lineTo(lx+5+(6+((i*13)%18)),yy); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ---------------- table tennis ----------------
+function tableTennisTable(x1,x2){
+  const floor=GROUND_Y, y=floor-16;
+  ctx.strokeStyle=COL.line; ctx.lineWidth=2;
+  ctx.strokeRect(x1,y-4,x2-x1,4);
+  ctx.beginPath();
+  ctx.moveTo(x1+8,y); ctx.lineTo(x1+8,floor);
+  ctx.moveTo(x2-8,y); ctx.lineTo(x2-8,floor);
+  ctx.stroke();
+  const midx=(x1+x2)/2;
+  ctx.beginPath();
+  ctx.moveTo(midx,y-4); ctx.lineTo(midx,y-16);
+  ctx.moveTo(midx-10,y-16); ctx.lineTo(midx+10,y-16);
+  ctx.stroke();
+  return y;
+}
+
+// ---------------- easel / painting ----------------
+function easel(cx, progress){
+  const floor=GROUND_Y;
+  ctx.strokeStyle=COL.line; ctx.lineWidth=2;
+  const w=70,h=76, cyTop=floor-h;
+  ctx.fillStyle=COL.paper;
+  ctx.fillRect(cx-w/2, cyTop, w, h*0.72);
+  ctx.strokeRect(cx-w/2, cyTop, w, h*0.72);
+  ctx.beginPath();
+  ctx.moveTo(cx-w/2, cyTop+h*0.72); ctx.lineTo(cx-w/2-14, floor);
+  ctx.moveTo(cx+w/2, cyTop+h*0.72); ctx.lineTo(cx+w/2+14, floor);
+  ctx.moveTo(cx, cyTop+h*0.4); ctx.lineTo(cx, floor);
+  ctx.stroke();
+  ctx.save();
+  ctx.beginPath(); ctx.rect(cx-w/2, cyTop, w, h*0.72); ctx.clip();
+  ctx.strokeStyle=COL.ink; ctx.lineWidth=1.6;
+  if(progress>0.15){
+    ctx.beginPath();
+    ctx.moveTo(cx-w/2+4, cyTop+h*0.55);
+    ctx.lineTo(cx-w/2+22, cyTop+h*0.28);
+    ctx.lineTo(cx-w/2+38, cyTop+h*0.5);
+    ctx.stroke();
+  }
+  if(progress>0.4){ ctx.beginPath(); ctx.arc(cx+w*0.22, cyTop+h*0.2, 7,0,Math.PI*2); ctx.stroke(); }
+  if(progress>0.6){
+    ctx.fillStyle='#7a6fd6';
+    ctx.beginPath();
+    ctx.moveTo(cx-w/2+4, cyTop+h*0.55);
+    ctx.lineTo(cx-w/2+22, cyTop+h*0.28);
+    ctx.lineTo(cx-w/2+38, cyTop+h*0.5);
+    ctx.lineTo(cx-w/2+4, cyTop+h*0.5);
+    ctx.closePath(); ctx.globalAlpha=0.5; ctx.fill(); ctx.globalAlpha=1;
+  }
+  if(progress>0.8){
+    ctx.beginPath();
+    ctx.moveTo(cx-w/2, cyTop+h*0.68); ctx.lineTo(cx+w/2, cyTop+h*0.6); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// ---------------- pottery ----------------
+function potteryStool(cx){
+  const floor=GROUND_Y, seatY=floor-16;
+  ctx.strokeStyle=COL.line; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(cx-10,seatY); ctx.lineTo(cx+10,seatY); ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx-8,seatY); ctx.lineTo(cx-8,floor);
+  ctx.moveTo(cx+8,seatY); ctx.lineTo(cx+8,floor);
+  ctx.stroke();
+}
+function potteryWheel(cx,spin){
+  const floor=GROUND_Y, y=floor-10;
+  ctx.strokeStyle=COL.line; ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(cx-18,floor); ctx.lineTo(cx+18,floor);
+  ctx.moveTo(cx-14,floor); ctx.lineTo(cx-8,y);
+  ctx.moveTo(cx+14,floor); ctx.lineTo(cx+8,y);
+  ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(cx,y,22,7,0,0,Math.PI*2); ctx.stroke();
+  for(let i=0;i<4;i++){
+    const a = spin + i*Math.PI/2;
+    ctx.beginPath(); ctx.moveTo(cx,y); ctx.lineTo(cx+Math.cos(a)*20, y+Math.sin(a)*6); ctx.stroke();
+  }
+  return y;
+}
+function claySilhouette(cx, wheelY, progress){
+  const blob=[10,13,15,15,13,9], vase=[8,13,16,12,7,9], n=blob.length;
+  const h = 4+(34-4)*progress;
+  ctx.strokeStyle=COL.line; ctx.fillStyle='rgba(143,124,240,0.18)'; ctx.lineWidth=2;
+  ctx.beginPath();
+  for(let i=0;i<n;i++){
+    const r = blob[i]+(vase[i]-blob[i])*progress, py = wheelY-(i/(n-1))*h, px = cx-r;
+    if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  for(let i=n-1;i>=0;i--){
+    const r = blob[i]+(vase[i]-blob[i])*progress, py = wheelY-(i/(n-1))*h;
+    ctx.lineTo(cx+r,py);
+  }
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+}
+
+// ---------------- badminton ----------------
+function badmintonNet(netX){
+  const floor=GROUND_Y, topY=floor-58;
+  ctx.strokeStyle=COL.lineDim; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(netX-90,floor); ctx.lineTo(netX+90,floor); ctx.stroke();
+  ctx.strokeStyle=COL.line; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(netX,floor); ctx.lineTo(netX,topY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(netX,topY); ctx.lineTo(netX,topY+22); ctx.stroke();
+  ctx.strokeStyle=COL.lineDim; ctx.lineWidth=1;
+  for(let i=-3;i<=3;i++){ ctx.beginPath(); ctx.moveTo(netX+i*4,topY); ctx.lineTo(netX+i*4,topY+22); ctx.stroke(); }
+  for(let j=0;j<=3;j++){ ctx.beginPath(); ctx.moveTo(netX-12,topY+j*7); ctx.lineTo(netX+12,topY+j*7); ctx.stroke(); }
+}
+
+function drawGround(){
+  ctx.strokeStyle=COL.lineDim; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(0,GROUND_Y); ctx.lineTo(BG_W,GROUND_Y); ctx.stroke();
+}
+
+function drawBackground(codeOffset, paintProgress, potteryProgress, wheelSpin){
+  ctx.clearRect(0,0,BG_W,BG_H);
+  ctx.fillStyle=COL.bg; ctx.fillRect(0,0,BG_W,BG_H);
+  drawGround();
+  drawSunWindow(SCENES.bed1.x+34, 90, 70, 70, sunProgress);
+  const bed1Info = bed(SCENES.bed1.x, SCENES.bed1.w);
+  chairAndDesk(SCENES.desk.x, codeOffset);
+  const tableY = tableTennisTable(SCENES.tt.tableL, SCENES.tt.tableR);
+  easel(SCENES.easel.x, paintProgress);
+  potteryStool(SCENES.pottery.x-34);
+  const wheelY = potteryWheel(SCENES.pottery.x, wheelSpin);
+  claySilhouette(SCENES.pottery.x, wheelY, potteryProgress);
+  badmintonNet(SCENES.bad.netX);
+  drawMoonWindow(SCENES.bed2.x+34, 90, 70, 70, moonProgress);
+  const bed2Info = bed(SCENES.bed2.x, SCENES.bed2.w);
+  return {bed1Info, bed2Info, tableY};
+}
+
+// ============================================================
+// FIGURE (supports single-segment or knee/elbow two-segment limbs)
+// ============================================================
+function limbTo(ox, oy, seg){
+  if(Array.isArray(seg)){ ctx.moveTo(ox,oy); ctx.lineTo(seg[0],seg[1]); }
+  else { ctx.moveTo(ox,oy); ctx.lineTo(seg.mid[0],seg.mid[1]); ctx.lineTo(seg.end[0],seg.end[1]); }
+}
+function drawFigure(cx, groundY, facing, color, pose){
+  ctx.save();
+  ctx.translate(cx, groundY);
+  ctx.scale(facing,1);
+  ctx.strokeStyle=color; ctx.fillStyle=color;
+  ctx.lineWidth=2.4; ctx.lineCap='round'; ctx.lineJoin='round';
+  const hipY=pose.hipY, shY=hipY-24, headY=shY-13, lean=pose.torsoLean||0;
+
+  ctx.beginPath(); limbTo(0,hipY,pose.legL); limbTo(0,hipY,pose.legR); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,hipY); ctx.lineTo(lean,shY); ctx.stroke();
+  ctx.beginPath(); limbTo(lean,shY,pose.armL); limbTo(lean,shY,pose.armR); ctx.stroke();
+  ctx.beginPath(); ctx.arc(lean, headY, 8, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(lean-6, headY-4);
+  ctx.quadraticCurveTo(lean-16, headY+2, lean-10, headY+14);
+  ctx.stroke();
+
+  if(pose.racket){
+    const end = Array.isArray(pose.armR)?pose.armR:pose.armR.end;
+    ctx.beginPath(); ctx.moveTo(end[0],end[1]); ctx.lineTo(end[0]+pose.racket[0], end[1]+pose.racket[1]); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(end[0]+pose.racket[0], end[1]+pose.racket[1], 6,8,0.3,0,Math.PI*2); ctx.stroke();
+  }
+  ctx.restore();
+}
+// back-facing figure — used at the desk so we see the character from behind, square to the laptop
+function drawFigureBack(cx, groundY, color, pose){
+  ctx.save();
+  ctx.translate(cx, groundY);
+  ctx.strokeStyle=color; ctx.fillStyle=color;
+  ctx.lineWidth=2.4; ctx.lineCap='round'; ctx.lineJoin='round';
+  const hipY=pose.hipY, shY=hipY-24, headY=shY-13;
+
+  ctx.beginPath(); limbTo(0,hipY,pose.legL); limbTo(0,hipY,pose.legR); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,hipY); ctx.lineTo(0,shY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-7,shY); ctx.lineTo(7,shY); ctx.stroke();
+  ctx.beginPath(); limbTo(-6,shY,pose.armL); limbTo(6,shY,pose.armR); ctx.stroke();
+  ctx.beginPath(); ctx.arc(0, headY, 8, 0, Math.PI*2); ctx.fill();
+  // hair covering the back of the head — no side fringe, so no face reads on this view
+  ctx.beginPath(); ctx.arc(0, headY-1, 8.6, Math.PI*1.05, Math.PI*1.95); ctx.stroke();
+  ctx.restore();
+}
+function drawHeadOnPillow(pillowCx, pillowCy, color, breathe){
+  ctx.save();
+  ctx.fillStyle=color; ctx.strokeStyle=color; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.arc(pillowCx-4, pillowCy-6+breathe, 8, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(pillowCx-8,pillowCy-6+breathe); ctx.lineTo(pillowCx-2,pillowCy-6+breathe); ctx.stroke();
+  ctx.restore();
+}
+
+// ---------------- poses ----------------
+function poseWalk(phase){
+  const s=Math.sin(phase*Math.PI*2), c=Math.cos(phase*Math.PI*2), bob=Math.abs(s)*2;
+  return {hipY:-34+bob, legL:[10*s,bob], legR:[-10*s,bob], armL:[-9*c,-16+bob], armR:[9*c,-16+bob], torsoLean:1};
+}
+function poseSitUp(k){
+  const lean=10*(1-k);
+  return {hipY:-16, legL:[16,0], legR:[10,0], armL:[-8,-10-6*k], armR:[8,-10-6*k], torsoLean:lean};
+}
+function poseStretch(k){
+  const raise=-14-10*Math.sin(k*Math.PI);
+  return {hipY:-34, legL:[6,0], legR:[-6,0], armL:[-6,raise], armR:[6,raise], torsoLean:0};
+}
+function poseSitChair(phase){
+  const type=Math.sin(phase*Math.PI*2)*2;
+  return {
+    hipY:-36,
+    legL:{mid:[10,-36], end:[10,0]}, legR:{mid:[17,-34], end:[17,0]},
+    armL:{mid:[10,-54], end:[16,-56+type]}, armR:{mid:[17,-56], end:[25,-58-type]}
+  };
+}
+function poseTableTennis(phase){
+  const swing=Math.sin(phase*Math.PI*2);
+  return {hipY:-34, legL:[10,0], legR:[-8,2], armL:[-8,-18], armR:[14+swing*10,-16-swing*8], torsoLean:swing*3, racket:[8,-6]};
+}
+function posePartnerIdleTT(phase){
+  const p=(phase+0.5)%1, swing=Math.sin(p*Math.PI*2);
+  return {hipY:-34, legL:[8,0], legR:[-8,0], armL:[-10,-16], armR:[8+swing*10,-16-swing*8], torsoLean:swing*3, racket:[8,-6]};
+}
+function posePainting(phase){
+  const swing=Math.sin(phase*Math.PI*2);
+  return {hipY:-34, legL:[8,0], legR:[-8,0], armL:[-8,-16], armR:[10+swing*6,-30+swing*4], torsoLean:1};
+}
+function posePotterySit(phase){
+  const k=Math.sin(phase*Math.PI*2)*2;
+  return {hipY:-16, legL:{mid:[16,-16], end:[16,0]}, legR:{mid:[10,-14], end:[10,0]}, armL:[-6+k,-8], armR:[8-k,-8], torsoLean:6};
+}
+function poseBadminton(phase){
+  const swing=Math.sin(phase*Math.PI*2);
+  return {hipY:-34+Math.abs(swing)*3, legL:[12,0], legR:[-10,2], armL:[-8,-16], armR:[14+swing*14,-30-swing*10], torsoLean:-swing*4, racket:[10,-10]};
+}
+function posePartnerIdleBad(phase){
+  const swing=Math.sin(phase*Math.PI*2);
+  return {hipY:-34+Math.abs(swing)*3, legL:[10,0], legR:[-8,2], armL:[-8,-16], armR:[10+swing*14,-28-swing*10], torsoLean:-swing*4, racket:[10,-10]};
+}
+
+// ============================================================
+// GIRL + STATE MACHINE  (no evening exit/re-entry — she walks straight to bed2)
+// ============================================================
+const girl = { x: STOPS.bed1Foot, facing:1 };
+const WALK_SPEED = 130;
+function moveTo(obj, targetX, dt){
+  const dx = targetX - obj.x;
+  if(Math.abs(dx) < 2){ obj.x = targetX; return true; }
+  obj.facing = dx>0?1:-1;
+  obj.x += Math.sign(dx)*Math.min(Math.abs(dx), WALK_SPEED*dt);
+  return false;
+}
+
+let state='wake', stateT=0;
+let ballT=0, rallyCount=0, showYaay=false, yaayT=0, shuttleT=0;
+let codeOffset=0, paintProgress=0, potteryProgress=0, wheelSpin=0;
+
+const DUR = { wake:2.8, code:4.2, tt:5.5, paint:5.0, pottery:5.0, bad:5.0, sleep:4.5 };
+
+function enterState(s){
+  state=s; stateT=0;
+  if(s==='tt'){ rallyCount=0; showYaay=false; }
+  if(s==='paint') paintProgress=0;
+  if(s==='pottery') potteryProgress=0;
+}
+
+function update(dt){
+  t += dt; stateT += dt;
+  codeOffset += dt*14; wheelSpin += dt*4;
+
+  switch(state){
+    case 'wake':
+      sunProgress = Math.min(1, stateT/DUR.wake);
+      if(stateT >= DUR.wake){ girl.x = STOPS.bed1Foot; girl.facing=1; enterState('walk_desk'); }
+      break;
+    case 'walk_desk':
+      if(moveTo(girl, STOPS.deskSeat, dt)){ girl.facing=1; enterState('code'); }
+      break;
+    case 'code':
+      if(stateT >= DUR.code) enterState('walk_tt');
+      break;
+    case 'walk_tt':
+      if(moveTo(girl, STOPS.ttSpot, dt)) enterState('tt');
+      break;
+    case 'tt': {
+      ballT += dt;
+      const cyc=1.4, phase=(ballT%cyc)/cyc;
+      if(phase < 0.02) rallyCount++;
+      if(rallyCount>=3 && !showYaay){ showYaay=true; yaayT=0; }
+      if(showYaay) yaayT += dt;
+      if(stateT >= DUR.tt) enterState('walk_easel');
+      break;
     }
-    resize();
-    window.addEventListener('resize', resize);
-
-    /* ── Draw one dog at (0,0) facing right, scale 1
-       Dog is ~44px wide, ~30px tall at scale=1
-       violet stroke: #a78bfa, no fill (outline only)
-    ── */
-    function drawDog(legPhase, sitting, facing) {
-      var c = ctx;
-      c.save();
-      if (facing === -1) { c.scale(-1, 1); }
-
-      var S = '#a78bfa'; // violet
-      c.strokeStyle = S;
-      c.lineWidth   = 1.8;
-      c.lineCap     = 'round';
-      c.lineJoin    = 'round';
-
-      if (sitting) {
-        /* ── SITTING DOG ── */
-        // body (oval)
-        c.beginPath();
-        c.ellipse(0, -14, 12, 9, -0.2, 0, Math.PI*2);
-        c.stroke();
-
-        // head
-        c.beginPath();
-        c.ellipse(15, -19, 8, 7, 0.1, 0, Math.PI*2);
-        c.stroke();
-
-        // ear (floppy)
-        c.beginPath();
-        c.moveTo(13, -24);
-        c.bezierCurveTo(18, -29, 24, -26, 22, -19);
-        c.stroke();
-
-        // eye
-        c.beginPath();
-        c.arc(18, -20, 1.2, 0, Math.PI*2);
-        c.fillStyle = S;
-        c.fill();
-
-        // nose
-        c.beginPath();
-        c.arc(23, -18, 1, 0, Math.PI*2);
-        c.fill();
-
-        // tail (up curled)
-        c.beginPath();
-        c.moveTo(-10, -14);
-        c.bezierCurveTo(-20, -14, -22, -28, -14, -28);
-        c.stroke();
-
-        // front legs (folded)
-        c.beginPath();
-        c.moveTo(6, -6);  c.lineTo(6, 4);
-        c.moveTo(2, -6);  c.lineTo(2, 4);
-        c.stroke();
-
-        // back haunches
-        c.beginPath();
-        c.moveTo(-8, -6);
-        c.bezierCurveTo(-8, 0, -4, 4, -2, 4);
-        c.moveTo(-12, -6);
-        c.bezierCurveTo(-12, 0, -8, 4, -6, 4);
-        c.stroke();
-
-      } else {
-        /* ── RUNNING DOG ── */
-        var t = legPhase; // 0..1 running cycle
-        var bounce = Math.sin(t * Math.PI * 2) * 2; // body bob
-
-        // body
-        c.beginPath();
-        c.ellipse(0, -14 + bounce, 14, 8, 0, 0, Math.PI*2);
-        c.stroke();
-
-        // neck
-        c.beginPath();
-        c.moveTo(10, -20 + bounce);
-        c.lineTo(16, -24 + bounce);
-        c.stroke();
-
-        // head
-        c.beginPath();
-        c.ellipse(21, -26 + bounce, 8, 6, 0.3, 0, Math.PI*2);
-        c.stroke();
-
-        // ear (flapping with run)
-        var earFlap = Math.sin(t * Math.PI * 4) * 4;
-        c.beginPath();
-        c.moveTo(18, -30 + bounce);
-        c.bezierCurveTo(22, -36 + bounce + earFlap, 28, -33 + bounce, 27, -27 + bounce);
-        c.stroke();
-
-        // eye
-        c.beginPath();
-        c.arc(25, -27 + bounce, 1.2, 0, Math.PI*2);
-        c.fillStyle = S;
-        c.fill();
-
-        // nose
-        c.beginPath();
-        c.arc(29, -25 + bounce, 1, 0, Math.PI*2);
-        c.fill();
-
-        // tail (wagging)
-        var wag = Math.sin(t * Math.PI * 4) * 10;
-        c.beginPath();
-        c.moveTo(-12, -14 + bounce);
-        c.bezierCurveTo(-20, -14 + bounce, -25, -20 + bounce + wag, -22, -26 + bounce + wag);
-        c.stroke();
-
-        // LEGS — 4 legs, alternating pairs
-        var a1 = Math.sin(t * Math.PI * 2);       // front pair phase
-        var a2 = Math.sin(t * Math.PI * 2 + Math.PI); // back pair phase
-
-        var gnd = -6 + bounce; // ground reference
-
-        // front-left leg
-        var fl1x = 6,  fl1y = gnd;
-        var fl1ex = fl1x + a1 * 8,  fl1ey = fl1y + Math.abs(a1) * 10;
-        c.beginPath();
-        c.moveTo(fl1x, fl1y);
-        c.quadraticCurveTo(fl1x + a1*4, fl1y + 6, fl1ex, fl1ey);
-        c.stroke();
-
-        // front-right leg
-        var fr1x = 10, fr1y = gnd;
-        var fr1ex = fr1x - a1 * 8, fr1ey = fr1y + Math.abs(a1) * 10;
-        c.beginPath();
-        c.moveTo(fr1x, fr1y);
-        c.quadraticCurveTo(fr1x - a1*4, fr1y + 6, fr1ex, fr1ey);
-        c.stroke();
-
-        // back-left leg
-        var bl1x = -8,  bl1y = gnd;
-        var bl1ex = bl1x + a2 * 9,  bl1ey = bl1y + Math.abs(a2) * 10;
-        c.beginPath();
-        c.moveTo(bl1x, bl1y);
-        c.quadraticCurveTo(bl1x + a2*4, bl1y + 6, bl1ex, bl1ey);
-        c.stroke();
-
-        // back-right leg
-        var br1x = -12, br1y = gnd;
-        var br1ex = br1x - a2 * 9, br1ey = br1y + Math.abs(a2) * 10;
-        c.beginPath();
-        c.moveTo(br1x, br1y);
-        c.quadraticCurveTo(br1x - a2*4, br1y + 6, br1ex, br1ey);
-        c.stroke();
+    case 'walk_easel':
+      if(moveTo(girl, STOPS.easelSpot, dt)) enterState('paint');
+      break;
+    case 'paint':
+      paintProgress = Math.min(1, stateT/DUR.paint);
+      if(stateT >= DUR.paint) enterState('walk_pottery');
+      break;
+    case 'walk_pottery':
+      if(moveTo(girl, STOPS.potterySpot, dt)) enterState('pottery');
+      break;
+    case 'pottery':
+      potteryProgress = Math.min(1, stateT/DUR.pottery);
+      if(stateT >= DUR.pottery) enterState('walk_bad');
+      break;
+    case 'walk_bad':
+      if(moveTo(girl, STOPS.badSpot, dt)) enterState('bad');
+      break;
+    case 'bad':
+      shuttleT += dt;
+      if(stateT >= DUR.bad) enterState('walk_bed2');
+      break;
+    case 'walk_bed2':
+      if(moveTo(girl, STOPS.bed2Foot, dt)) enterState('sleep');
+      break;
+    case 'sleep':
+      moonProgress = Math.min(1, stateT/1.6);
+      if(stateT >= DUR.sleep){
+        sunProgress=0; moonProgress=0; girl.x=STOPS.bed1Foot; girl.facing=1;
+        enterState('wake');
       }
+      break;
+  }
+}
 
-      c.restore();
+// ============================================================
+// RENDER
+// ============================================================
+function render(){
+  const info = drawBackground(codeOffset, paintProgress, potteryProgress, wheelSpin);
+
+  switch(state){
+    case 'wake': {
+      const p = stateT/DUR.wake;
+      if(p < 0.35){
+        drawHeadOnPillow(info.bed1Info.pillowCx, info.bed1Info.pillowCy, COL.girl, Math.sin(t*4)*0.6);
+        ctx.fillStyle=COL.line; ctx.font='12px sans-serif';
+        ctx.fillText('z z z', info.bed1Info.pillowCx-6, info.bed1Info.pillowCy-16);
+      } else if(p < 0.7){
+        const k=(p-0.35)/0.35;
+        drawFigure(STOPS.bed1Foot, GROUND_Y, 1, COL.girl, poseSitUp(k));
+      } else {
+        const k=(p-0.7)/0.3;
+        drawFigure(STOPS.bed1Foot, GROUND_Y, 1, COL.girl, poseStretch(k));
+      }
+      break;
     }
-
-    /* ── Draw "oof" speech bubble above dog ── */
-    function drawBubble(text) {
-      var c = ctx;
-      var styles = getComputedStyle(document.body);
-      c.save();
-      var W2 = text.length * 7 + 16;
-      var H2 = 22;
-      // bubble body
-      c.fillStyle   = styles.getPropertyValue('--dog-bubble-bg').trim();
-      c.strokeStyle = '#a78bfa';
-      c.lineWidth   = 1.5;
-      c.beginPath();
-      c.roundRect(-W2/2, -H2 - 6, W2, H2, 5);
-      c.fill(); c.stroke();
-      // tail pointer
-      c.beginPath();
-      c.moveTo(-4, -6);
-      c.lineTo(4, -6);
-      c.lineTo(0, 0);
-      c.closePath();
-      c.fill(); c.stroke();
-      // text
-      c.fillStyle = styles.getPropertyValue('--canvas-text').trim();
-      c.font      = 'bold 10px Inter, sans-serif';
-      c.textAlign = 'center';
-      c.textBaseline = 'middle';
-      c.fillText(text, 0, -H2/2 - 6);
-      c.restore();
+    case 'walk_desk': case 'walk_tt': case 'walk_easel':
+    case 'walk_pottery': case 'walk_bad': case 'walk_bed2': {
+      const phase=(t*2.2)%1;
+      drawFigure(girl.x, GROUND_Y, girl.facing, COL.girl, poseWalk(phase));
+      break;
     }
-
-    /* ── Dog state ── */
-    var DOG_COUNT = 4;
-    var dogs = [];
-    var W = canvas.width;
-    var GY = canvas.height - 12; // ground y
-
-    var bubbleTexts = ['oof','woof','bork','ruff','yip'];
-
-    for (var i = 0; i < DOG_COUNT; i++) {
-      var dir = (Math.random() < 0.5) ? 1 : -1;
-      dogs.push({
-        x: Math.random() * W,
-        dir: dir,
-        speed: 0.8 + Math.random() * 0.9,
-        legPhase: Math.random(),
-        scale: 0.9 + Math.random() * 0.45,
-        pauseTimer: 0,
-        sitting: false,
-        bubbleTimer: 0,
-        bubbleText: '',
-        nextPause: 200 + Math.floor(Math.random() * 400)
-      });
+    case 'code': {
+      const phase=(stateT*0.6)%1;
+      drawFigureBack(STOPS.deskSeat, GROUND_Y, COL.girl, poseSitChair(phase));
+      break;
     }
-
-    var frame = 0;
-
-    function tick() {
-      W = canvas.width;
-      ctx.clearRect(0, 0, W, canvas.height);
-
-      dogs.forEach(function(d) {
-        frame++;
-
-        if (d.pauseTimer > 0) {
-          d.pauseTimer--;
-          d.sitting = true;
-          // show bubble
-          if (d.bubbleTimer > 0) {
-            d.bubbleTimer--;
-          } else if (d.pauseTimer > 60 && d.bubbleText === '') {
-            d.bubbleText  = bubbleTexts[Math.floor(Math.random() * bubbleTexts.length)];
-            d.bubbleTimer = 60;
-          }
-          if (d.pauseTimer === 0) {
-            d.sitting    = false;
-            d.bubbleText = '';
-            d.nextPause  = 200 + Math.floor(Math.random() * 500);
-          }
-        } else {
-          d.sitting = false;
-          d.bubbleText = '';
-          d.x += d.speed * d.dir;
-          d.legPhase = (d.legPhase + 0.035) % 1;
-
-          // wrap
-          if (d.x > W + 60)  d.x = -60;
-          if (d.x < -60)     d.x = W + 60;
-
-          d.nextPause--;
-          if (d.nextPause <= 0) {
-            d.pauseTimer = 80 + Math.floor(Math.random() * 120);
-          }
-        }
-
+    case 'tt': {
+      const phase=(t*0.9)%1;
+      drawFigure(STOPS.ttSpot, GROUND_Y, 1, COL.girl, poseTableTennis(phase));
+      drawFigure(SCENES.tt.partnerX, GROUND_Y, -1, COL.partner, posePartnerIdleTT(phase));
+      const cyc=1.4, bp=(ballT%cyc)/cyc;
+      let bx,by;
+      if(bp<0.5){ const k=bp/0.5; bx=STOPS.ttSpot+18+k*(SCENES.tt.partnerX-30-(STOPS.ttSpot+18)); by=info.tableY-20-30*Math.sin(k*Math.PI); }
+      else { const k=(bp-0.5)/0.5; bx=SCENES.tt.partnerX-30-k*(SCENES.tt.partnerX-30-(STOPS.ttSpot+18)); by=info.tableY-20-30*Math.sin(k*Math.PI); }
+      ctx.fillStyle=COL.shuttle; ctx.beginPath(); ctx.arc(bx,by,3.5,0,Math.PI*2); ctx.fill();
+      if(showYaay && yaayT<1.2){
         ctx.save();
-        ctx.translate(d.x, GY);
-        ctx.scale(d.scale, d.scale);
-
-        // bubble
-        if (d.bubbleText && d.bubbleTimer > 0) {
-          ctx.save();
-          ctx.translate(d.dir === 1 ? 10 : -10, -45);
-          drawBubble(d.bubbleText);
-          ctx.restore();
-        }
-
-        drawDog(d.legPhase, d.sitting, d.dir);
+        ctx.globalAlpha=Math.min(1,(1.2-yaayT)*2);
+        ctx.fillStyle=COL.line; ctx.font='bold 16px sans-serif'; ctx.textAlign='center';
+        ctx.fillText('Yaay!! 🎉', STOPS.ttSpot, GROUND_Y-90-yaayT*10);
         ctx.restore();
-      });
-
-      requestAnimationFrame(tick);
+      }
+      break;
     }
+    case 'paint': {
+      const phase=(t*0.8)%1;
+      drawFigure(STOPS.easelSpot, GROUND_Y, 1, COL.girl, posePainting(phase));
+      break;
+    }
+    case 'pottery': {
+      const phase=(t*1.0)%1;
+      drawFigure(STOPS.potterySpot, GROUND_Y, 1, COL.girl, posePotterySit(phase));
+      break;
+    }
+    case 'bad': {
+      const phase=(t*0.9)%1;
+      drawFigure(STOPS.badSpot, GROUND_Y, 1, COL.girl, poseBadminton(phase));
+      drawFigure(SCENES.bad.partnerX, GROUND_Y, -1, COL.partner, posePartnerIdleBad(phase+0.5));
+      // shuttle phase is locked to the swing phase (0.25 = girl's racket contact, 0.75 = partner's) so the hit and return are synced to the animation
+      const sp=(phase-0.25+1)%1;
+      let sx, sy;
+      if(sp<0.5){
+        const k=sp/0.5;
+        sx=STOPS.badSpot+16+k*(SCENES.bad.partnerX-16-(STOPS.badSpot+16));
+        sy=GROUND_Y-40-Math.sin(k*Math.PI)*60;
+      } else {
+        const k=(sp-0.5)/0.5;
+        sx=SCENES.bad.partnerX-16-k*(SCENES.bad.partnerX-16-(STOPS.badSpot+16));
+        sy=GROUND_Y-40-Math.sin(k*Math.PI)*60;
+      }
+      ctx.fillStyle=COL.shuttle;
+      ctx.beginPath(); ctx.moveTo(sx,sy-4); ctx.lineTo(sx-3,sy+3); ctx.lineTo(sx+3,sy+3); ctx.closePath(); ctx.fill();
+      break;
+    }
+    case 'sleep': {
+      drawHeadOnPillow(info.bed2Info.pillowCx, info.bed2Info.pillowCy, COL.girl, Math.sin(t*2)*0.8);
+      ctx.fillStyle=COL.line; ctx.font='12px sans-serif';
+      ctx.fillText('z z z', info.bed2Info.pillowCx-6, info.bed2Info.pillowCy-16);
+      break;
+    }
+  }
+}
 
-    requestAnimationFrame(tick);
+let last = performance.now();
+function loop(now){
+  const dt = Math.min(0.05, (now-last)/1000);
+  last = now;
+  update(dt);
+  render();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
   })();
-
 
   /* ── CAROUSEL ── */
   (function () {
