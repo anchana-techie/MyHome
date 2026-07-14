@@ -925,7 +925,8 @@ function update(dt){
     case 'sleep':
       moonProgress = Math.min(1, stateT/1.6);
       if(stateT >= DUR.sleep){
-        sunProgress=0; moonProgress=0; girl.x=STOPS.bed1Foot; girl.facing=1;
+        sunProgress=0; moonProgress=0; paintProgress=0; potteryProgress=0;
+        girl.x=STOPS.bed1Foot; girl.facing=1;
         enterState('wake');
       }
       break;
