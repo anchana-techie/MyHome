@@ -4,11 +4,16 @@ ingest.py
 This is the "build the index" step of RAG.
 
 What it does, in data-pipeline terms:
-1. Reads your portfolio content (data/portfolio_content.json) - think of this
+1. Reads your portfolio content (portfolio_content.json) - think of this
    as your source table.
 2. Converts each chunk of text into a vector (a list of numbers that captures
-   its meaning) using Gemini's embedding model - think of this as a
+   its meaning) using a local, free embedding model (fastembed / BAAI's
+   bge-small-en-v1.5, running via ONNX Runtime on CPU) - think of this as a
    transformation step, like a DAX measure but for meaning instead of numbers.
+   This runs entirely on your machine (or on Render) - no API key, no cost,
+   no rate limit. Groq itself does not offer an embeddings endpoint, so this
+   step no longer talks to Groq at all; only chat/generation (in main.py)
+   uses Groq.
 3. Stores those vectors in a FAISS index (a small, fast local "table" built
    for similarity search) plus a metadata file mapping each vector back to
    its original text.
@@ -16,9 +21,17 @@ What it does, in data-pipeline terms:
 Run this ONCE locally whenever your portfolio content changes:
     python ingest.py
 
+The first run downloads the small embedding model (~130 MB) from
+Hugging Face and caches it locally; subsequent runs are instant.
+
 It produces two files in data/:
     - portfolio.index     (the FAISS vector index)
     - portfolio_meta.json (the original text, aligned to each vector)
+
+NOTE: Because we switched from Gemini's embedding model to bge-small-en-v1.5,
+the vectors are a different size/shape than before. You must re-run this
+script once after migrating so data/portfolio.index is rebuilt - old index
+files created by the Gemini version will NOT work with the new main.py.
 """
 
 import json
@@ -26,11 +39,7 @@ import os
 
 import faiss
 import numpy as np
-from dotenv import load_dotenv
-from google import genai
-from google.genai import types
-
-load_dotenv(override=True)
+from fastembed import TextEmbedding
 
 ROOT_DIR = os.path.dirname(__file__)
 DATA_DIR = os.path.join(ROOT_DIR, "data")
@@ -40,45 +49,20 @@ if not os.path.exists(CONTENT_PATH):
 INDEX_PATH = os.path.join(DATA_DIR, "portfolio.index")
 META_PATH = os.path.join(DATA_DIR, "portfolio_meta.json")
 
-EMBED_MODEL = "gemini-embedding-001"  # stable, text-only, has a free tier
+# Free, local, no API key needed. 384-dim, small (~130MB), good quality.
+EMBED_MODEL = "BAAI/bge-small-en-v1.5"
+
+_embedder = None
 
 
-def get_gemini_api_keys() -> list[str]:
-    load_dotenv(override=True)
-    keys = []
-    for env_name in ("GEMINI_API_KEY", "GEMINI_API_KEY_2", "GEMINI_API_KEY_3"):
-        value = os.environ.get(env_name, "").strip()
-        if value:
-            keys.append(value)
-    return keys
-
-
-def call_with_key_rotation(operation, *args, **kwargs):
-    api_keys = get_gemini_api_keys()
-    if not api_keys:
-        raise RuntimeError("No Gemini API keys set. Add GEMINI_API_KEY, GEMINI_API_KEY_2, and GEMINI_API_KEY_3 to your .env file.")
-
-    last_error = None
-    for index, key in enumerate(api_keys, start=1):
-        try:
-            client = genai.Client(api_key=key)
-            return operation(client, *args, **kwargs)
-        except Exception as exc:
-            last_error = exc
-            message = str(exc)
-            print(f"Embedding failed with key {index}/{len(api_keys)}: {message}")
-            if "429" in message or "RESOURCE_EXHAUSTED" in message or "quota" in message.lower():
-                continue
-            break
-    raise RuntimeError(f"All Gemini API keys failed. Last error: {last_error}") from last_error
+def get_embedder() -> TextEmbedding:
+    global _embedder
+    if _embedder is None:
+        _embedder = TextEmbedding(model_name=EMBED_MODEL)
+    return _embedder
 
 
 def main():
-    if not get_gemini_api_keys():
-        raise SystemExit(
-            "No Gemini API keys set. Add GEMINI_API_KEY, GEMINI_API_KEY_2, and GEMINI_API_KEY_3 to your .env file."
-        )
-
     os.makedirs(DATA_DIR, exist_ok=True)
 
     with open(CONTENT_PATH, "r", encoding="utf-8") as f:
@@ -86,20 +70,11 @@ def main():
 
     texts = [f"{c['title']}. {c['text']}" for c in chunks]
 
-    print(f"Embedding {len(texts)} chunks with {EMBED_MODEL}...")
-    vectors = []
-    for text in texts:
-        # Gemini's embed_content takes one input per call in the stable API
-        result = call_with_key_rotation(
-            lambda client: client.models.embed_content(
-                model=EMBED_MODEL,
-                contents=text,
-                config=types.EmbedContentConfig(task_type="RETRIEVAL_DOCUMENT"),
-            )
-        )
-        vectors.append(result.embeddings[0].values)
-
-    vectors = np.array(vectors, dtype="float32")
+    print(f"Embedding {len(texts)} chunks with {EMBED_MODEL} (local, free)...")
+    embedder = get_embedder()
+    # bge models are trained with a "passage:" style prefix for documents.
+    prefixed = [f"passage: {t}" for t in texts]
+    vectors = np.array(list(embedder.embed(prefixed)), dtype="float32")
 
     # Normalize vectors so we can use cosine similarity via inner product
     faiss.normalize_L2(vectors)

@@ -1815,14 +1815,24 @@ requestAnimationFrame(loop);
   bubble.addEventListener("click", () => panel.classList.toggle("open"));
 
   function addMessage(role, text) {
-    const div = document.createElement("div");
-    div.className = "pai-msg " + role;
-    div.innerHTML = `<span class="bubble"></span>`;
-    div.querySelector(".bubble").textContent = text;
-    messagesEl.appendChild(div);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-    return div;
+  const div = document.createElement("div");
+  div.className = "pai-msg " + role;
+  div.innerHTML = `<span class="bubble"></span>`;
+
+  const bubble = div.querySelector(".bubble");
+
+  // User messages stay as plain text.
+  if (role === "user") {
+    bubble.textContent = text;
+  } else {
+    // Bot messages can contain HTML (links)
+    bubble.innerHTML = text;
   }
+
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  return div;
+}
 
   function addTypingIndicator() {
     const div = document.createElement("div");

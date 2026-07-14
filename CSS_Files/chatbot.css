@@ -20,8 +20,25 @@
   .pai-msg { margin-bottom: 10px; }
   .pai-msg.user { text-align: right; color: #333; }
   .pai-msg.bot { text-align: left; color: #222; }
-  .pai-msg .bubble {
+  /* .pai-msg .bubble {
     display: inline-block; padding: 8px 12px; border-radius: 10px; max-width: 85%;
+  } */
+  .pai-msg .bubble {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 10px;
+    max-width: 85%;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    overflow-x: hidden;
+  }
+  .pai-msg .bubble a {
+      color: #6c4fd1;
+      text-decoration: underline;
+      overflow-wrap: anywhere;
+      word-break: break-word;
   }
   .pai-msg.user .bubble { background: #6c4fd1; color: #fff; }
   .pai-msg.bot .bubble { background: #f1f0f6; }

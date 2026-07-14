@@ -1,4 +1,4 @@
-    :root {
+:root {
       --bg:          #0a0b0e;
       --bg-raised:   #111318;
       --bg-card:     #161820;
@@ -47,10 +47,6 @@
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html {
-      overflow-x: hidden;
-    }
-
     body {
       font-family: var(--body);
       background: var(--bg);
@@ -58,7 +54,7 @@
       line-height: 1.7;
       -webkit-font-smoothing: antialiased;
       transition: background .25s, color .25s;
-      overflow-x: hidden;
+      /* overflow-x: hidden; */
     }
 
     .wrap {
@@ -66,4 +62,3 @@
       margin-inline: auto;
       padding-inline: clamp(1.25rem, 5vw, 3rem);
     }
-
