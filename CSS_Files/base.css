@@ -47,9 +47,9 @@
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html {
+    /* html {
       overflow-x: hidden;
-    }
+    } */
 
     body {
       font-family: var(--body);
@@ -58,7 +58,7 @@
       line-height: 1.7;
       -webkit-font-smoothing: antialiased;
       transition: background .25s, color .25s;
-      overflow-x: hidden;
+      /* overflow-x: hidden; */
     }
 
     .wrap {
