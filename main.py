@@ -317,7 +317,27 @@ def run_agent(messages: list) -> str:
         )
         return format_reply_html(reply_text)
 
-    context = search_portfolio(latest_user_message)
+    # context = search_portfolio(latest_user_message)
+    query = latest_user_message.lower()
+
+    if any(word in query for word in [
+        "expertise",
+        "skills",
+        "skill set",
+        "tech stack",
+        "technology",
+        "technologies",
+        "tools",
+    ]):
+        search_query = (
+            "technical skills programming languages "
+            "tools technologies experience databricks "
+            "python sql power bi azure"
+        )
+    else:
+        search_query = latest_user_message
+
+    context = search_portfolio(search_query)
 
     chat_messages = to_groq_messages(messages, context)
 

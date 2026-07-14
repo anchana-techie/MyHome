@@ -31,8 +31,8 @@
   },
   {
     "id": "skills",
-    "title": "Technical Skills",
-    "text": "Data Platforms: Databricks, SQL Server, Azure DevOps. Reporting: Power BI, SSRS, DAX. Languages: Python, T-SQL, DAX. ETL & Pipelines: DBT, ETL transformations, CI/CD pipelines. Integration: ODBC, Simba Spark Driver, PAT authentication. Cloud & DevOps: Azure DevOps, version control, pipeline management."
+    "title": "Technical Skills and Expertise",
+    "text": "Anchana specializes in data engineering, business intelligence, and analytics. Her expertise includes designing ETL pipelines, developing Power BI dashboards, migrating SSRS reports to Databricks, and building data transformation workflows. She is proficient in Python, SQL, Databricks, Power BI, DAX, DBT, Azure DevOps, SSRS, ODBC integration, CI/CD pipelines, and SQL Server."
   },
   {
     "id": "education",

@@ -30,9 +30,9 @@
     "text": "Anchana designed and implemented ETL transformation logic in Databricks to process and structure raw data for downstream consumption. She packaged and deployed ETL scripts as DBT models through Azure DevOps CI/CD pipelines, ensuring transformation logic adhered to data quality standards with full version control in the DevOps repository."
   },
   {
-    "id": "skills",
-    "title": "Technical Skills",
-    "text": "Data Platforms: Databricks, SQL Server, Azure DevOps. Reporting: Power BI, SSRS, DAX. Languages: Python, T-SQL, DAX. ETL & Pipelines: DBT, ETL transformations, CI/CD pipelines. Integration: ODBC, Simba Spark Driver, PAT authentication. Cloud & DevOps: Azure DevOps, version control, pipeline management."
+  "id": "skills",
+  "title": "Technical Skills and Expertise",
+  "text": "Anchana specializes in data engineering, business intelligence, and analytics. Her expertise includes designing ETL pipelines, developing Power BI dashboards, migrating SSRS reports to Databricks, and building data transformation workflows. She is proficient in Python, SQL, Databricks, Power BI, DAX, DBT, Azure DevOps, SSRS, ODBC integration, CI/CD pipelines, and SQL Server."
   },
   {
     "id": "education",
