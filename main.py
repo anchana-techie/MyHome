@@ -392,7 +392,21 @@ def run_agent(messages: list) -> str:
     # context = search_portfolio(latest_user_message)
     query = latest_user_message.lower()
 
-    if any(word in query for word in [
+    # "certification" queries were losing to the course_certifications chunk
+    # in embedding similarity (it literally has "certifications" in its
+    # title), so the Databricks cert chunk never made the cut. Bias the
+    # search query when the visitor asks about certifications but explicitly
+    # rules course certs out.
+    wants_non_course_cert = "certif" in query and (
+        "not" in query or "beyond" in query or "besides" in query or "other than" in query
+    )
+
+    if wants_non_course_cert:
+        search_query = (
+            "Databricks Certified Data Engineer Associate certification "
+            "professional certification issued valid"
+        )
+    elif any(word in query for word in [
         "expertise",
         "skills",
         "skill set",
@@ -409,7 +423,18 @@ def run_agent(messages: list) -> str:
     else:
         search_query = latest_user_message
 
-    context = search_portfolio(search_query)
+    # Broad, multi-topic asks ("everything", "start from X to Y", "all about
+    # her") span several sections at once. top_k=3 only ever returns 3 of 21
+    # chunks, so whole sections silently vanish from the answer. Widen the
+    # net for these instead of using a fixed top_k everywhere.
+    is_broad_query = any(phrase in query for phrase in [
+        "everything", "all about", "tell me about her", "full overview",
+        "complete picture", "start from", "starting from", "in detail",
+    ]) or query.count(" and ") >= 2
+
+    top_k = 8 if is_broad_query else 4
+
+    context = search_portfolio(search_query, top_k=top_k)
 
     chat_messages = to_groq_messages(messages, context)
 
