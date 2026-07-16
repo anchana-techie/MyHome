@@ -39,8 +39,9 @@ from datetime import datetime, timezone
 import faiss
 import numpy as np
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from groq import Groq
 from pydantic import BaseModel
 
@@ -453,3 +454,34 @@ def chat(req: ChatRequest, request: Request):
 @app.get("/")
 def health():
     return {"status": "ok"}
+
+
+# ---------------------------------------------------------------------------
+# Admin-only: download the chat log CSV.
+#
+# Render's free/starter tier has an EPHEMERAL filesystem - it resets on
+# every redeploy and on every spin-down/spin-up cycle (which happens
+# automatically after ~15 min of inactivity). There's no shell access on
+# this tier either. So the CSV must be pulled over HTTP periodically rather
+# than inspected on the server directly - it will NOT persist long-term
+# unless you download it (or later attach a paid persistent disk).
+#
+# Protected by a secret key so random visitors can't read your logs.
+# Set ADMIN_KEY in Render's environment variables (Dashboard -> your
+# service -> Environment), then visit:
+#   https://<your-render-app>.onrender.com/admin/chat-logs?key=<ADMIN_KEY>
+# ---------------------------------------------------------------------------
+@app.get("/admin/chat-logs")
+def download_chat_logs(key: str = ""):
+    admin_key = os.environ.get("ADMIN_KEY", "")
+    if not admin_key or key != admin_key:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    if not os.path.exists(CHAT_LOG_PATH):
+        raise HTTPException(status_code=404, detail="No chat logs recorded yet")
+
+    return FileResponse(
+        CHAT_LOG_PATH,
+        media_type="text/csv",
+        filename="chat_logs.csv",
+    )
