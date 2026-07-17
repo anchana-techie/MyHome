@@ -131,8 +131,24 @@ def format_reply_html(text: str) -> str:
     )
 
     # Make URLs clickable (even without https://)
+    # The model sometimes ends a sentence right after a link ("...profile.")
+    # and the URL_PATTERN regex above is greedy - it swallows trailing
+    # punctuation like that period since it's not whitespace, corrupting the
+    # href (e.g. ".../anchana-prabakaran-231331233." -> broken link). Strip
+    # trailing punctuation off the captured URL and place it back after the
+    # </a> tag instead, outside the link.
+    TRAILING_PUNCT = ".,;:!?)]}\"'"
+
     def replace_url(match):
         url = match.group(1)
+
+        trailing = ""
+        while url and url[-1] in TRAILING_PUNCT:
+            trailing = url[-1] + trailing
+            url = url[:-1]
+
+        if not url:
+            return match.group(0)
 
         href = url
         if not href.startswith(("http://", "https://")):
@@ -147,7 +163,7 @@ def format_reply_html(text: str) -> str:
             display = url
 
         return (
-            f'<a href="{href}" target="_blank" rel="noopener">{display}</a>'
+            f'<a href="{href}" target="_blank" rel="noopener">{display}</a>{trailing}'
         )
 
     text = URL_PATTERN.sub(replace_url, text)
