@@ -5,6 +5,14 @@
     "text": "Anchana Prabakaran is a Data Analyst based in Chennai, India, with 2+ years of experience engineering data pipelines, migrating hundreds of SSRS reports to Databricks, and delivering Power BI dashboards that drive business decisions. She is comfortable across the full data stack: converting T-SQL to Databricks-compatible SQL, configuring ODBC connectors, and deploying DBT models through Azure DevOps CI/CD. She holds an active Databricks Certified Data Engineer Associate certification."
   },
   {
+    "title": "Current Role",
+    "text": "Anchana's current role is Data Analyst at Indium Software Private Limited in Chennai, Tamil Nadu, India (Hybrid), since April 2026 (2.5+ years total professional experience). In this current position she is contributing to the final stretch of the SSRS-to-Databricks migration, converting transformation logic into DBT models and Databricks notebooks deployed through Azure DevOps CI/CD pipelines."
+  },
+  {
+    "title": "Work Experience Timeline",
+    "text": "Anchana's career at Indium Software Private Limited progressed through three roles: (1) Graduate Engineering Trainee, Chennai (On-site), Oct 2023 - Sep 2024 - started her data journey learning SQL Server fundamentals, Power BI reporting, and the SSRS ecosystem, assisting with early dashboard builds and query support. (2) Junior Data Analyst, Tamil Nadu (On-site), Oct 2024 - Mar 2026 - played a key role in migrating 200-400 SSRS reports from SQL Server to Databricks, automating extraction of table references and T-SQL from .rdl files with Python, configuring ODBC connectivity, and validating query outputs. (3) Data Analyst (current role), Chennai (Hybrid), Apr 2026 - Present - contributing to the final stretch of the SSRS-to-Databricks migration while converting transformation logic into DBT models and Databricks notebooks deployed via Azure DevOps CI/CD."
+  },
+  {
     "id": "contact",
     "title": "Contact Information",
     "text": "Email: anchana.professional@gmail.com. LinkedIn: linkedin.com/in/anchana-prabakaran-231331233. Based in Chennai, India."
@@ -30,9 +38,9 @@
     "text": "Anchana converted existing T-SQL stored procedures into DBT models for Databricks, and rebuilt the remaining stored procedures as Databricks notebooks, restructuring transformation logic to process and structure raw data for downstream consumption. She deployed both the DBT models and notebooks through Azure DevOps CI/CD pipelines with full version control in the repository, and authored the Terraform configuration to provision and schedule the corresponding Databricks job."
   },
   {
-  "id": "skills",
-  "title": "Technical Skills and Expertise",
-  "text": "Anchana specializes in data engineering, business intelligence, and analytics. Her expertise includes designing ETL pipelines, developing Power BI dashboards, migrating SSRS reports to Databricks, and building data transformation workflows. She is proficient in Python, SQL, Databricks, Power BI, DAX, DBT, Azure DevOps, SSRS, ODBC integration, CI/CD pipelines, and SQL Server."
+    "id": "skills",
+    "title": "Technical Skills and Expertise",
+    "text": "Anchana specializes in data engineering, business intelligence, and analytics. Her expertise includes designing ETL pipelines, developing Power BI dashboards, migrating SSRS reports to Databricks, and building data transformation workflows. She is proficient in Python, SQL, Databricks, Power BI, DAX, DBT, Azure DevOps, SSRS, ODBC integration, CI/CD pipelines, and SQL Server."
   },
   {
     "id": "education",
