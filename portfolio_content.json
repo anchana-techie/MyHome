@@ -111,5 +111,33 @@
     "id": "csr_school_painting",
     "title": "CSR: School Painting",
     "text": "Anchana contributed to a school painting initiative aimed at enhancing the learning environment and promoting creativity among students."
+  },
+  {
+    "title": "Quick Facts",
+    "text": "Quick facts about Anchana Prabakaran: she is a Data Analyst based in Chennai, Tamil Nadu, India. She currently works at Indium Software Private Limited (Hybrid), a role she has held since April 2026. She has 2.5+ years of total professional experience, all at Indium Software. She holds an active Databricks Certified Data Engineer Associate certification. She can be reached at anchana.professional@gmail.com or on LinkedIn at linkedin.com/in/anchana-prabakaran-231331233."
+  },
+  {
+    "title": "Career Stats & Achievements Snapshot",
+    "text": "In her career so far, Anchana has: 2.5+ years of professional experience; migrated 300+ SSRS reports from SQL Server to Databricks (out of an original scope of 200-400 reports); built 10+ Power BI dashboards for business stakeholders; and earned 1 Databricks certification (Databricks Certified Data Engineer Associate). These stats are drawn from her Experience page."
+  },
+  {
+    "title": "Role: Graduate Engineering Trainee (Oct 2023 - Sep 2024)",
+    "text": "Anchana's first role at Indium Software Private Limited was Graduate Engineering Trainee, based in Chennai, Tamil Nadu, India (On-site), from October 2023 to September 2024 (about 1 year). This is where she started her data journey, learning SQL Server fundamentals, Power BI reporting, and the SSRS ecosystem, while assisting with early dashboard builds and query support to get up to speed with the team's data stack."
+  },
+  {
+    "title": "Role: Junior Data Analyst (Oct 2024 - Mar 2026)",
+    "text": "Anchana's second role at Indium Software Private Limited was Junior Data Analyst, based in Tamil Nadu, India (On-site), from October 2024 to March 2026 (about 1 year 6 months). In this role she played a key part in the end-to-end migration of 200-400 SSRS reports from SQL Server to Databricks, automating extraction of table references and T-SQL from .rdl files with Python, configuring ODBC connectivity, and validating query outputs to resolve data-sync and logic discrepancies."
+  },
+  {
+    "title": "Technical Skills by Category",
+    "text": "Anchana's technical skills are grouped into six categories: Data Platforms - Databricks, SQL Server, Azure DevOps. Reporting - Power BI, SSRS, DAX. Languages - Python, T-SQL, DAX. ETL & Pipelines - DBT, ETL Transformations, CI/CD Pipelines. Integration - ODBC, Simba Spark Driver, PAT (Personal Access Token) Authentication. Cloud & DevOps - Azure DevOps, Version Control, Pipeline Management."
+  },
+  {
+    "title": "Beyond Work: Achievements & Recognition",
+    "text": "Outside of work, Anchana has earned recognition in several of her hobbies: her artwork won recognition in IGOT painting competitions; she has taken part in badminton tournaments; and she won a silver medal in a table tennis competition. These achievements are featured on the Beyond Work section of her portfolio alongside photos."
+  },
+  {
+    "title": "Portfolio Website Navigation & Chatbot Scope",
+    "text": "Anchana's portfolio website has the following sections, reachable from the top navigation: Experience (career timeline and stats), Projects (work experience and detailed project write-ups), Skills (technical skills grid), Education (degree and course certifications), Beyond Work (hobbies: art & painting, badminton, clay sculpting, table tennis), CSR (community service activities), and Resume (viewable/downloadable document). This chat assistant can answer questions about Anchana's experience, skills, projects, certifications, education, Beyond Work hobbies, and CSR involvement using the content from these sections."
   }
 ]
