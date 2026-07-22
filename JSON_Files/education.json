@@ -4,7 +4,10 @@
   "school": "Meenakshi Sundararajan Engineering College",
   "honour": "First Class with Distinction",
   "stats": [
-    { "value": "8.84", "label": "CGPA" }
+    {
+      "value": "8.84",
+      "label": "CGPA"
+    }
   ],
   "certificationsSectionTitle": "Course Certifications",
   "certifications": [

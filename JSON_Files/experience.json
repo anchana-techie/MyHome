@@ -3,10 +3,26 @@
   "title": "Experience",
   "subtitle": "A timeline of the roles I've grown through — from graduate trainee to data analyst, building dashboards, pipelines and data trust along the way.",
   "stats": [
-    { "icon": "briefcase", "value": "2.5+", "label": "Years of Experience" },
-    { "icon": "layers", "value": "300+", "label": "SSRS Reports Migrated" },
-    { "icon": "chart", "value": "10+", "label": "Power BI Dashboards" },
-    { "icon": "badge", "value": "1", "label": "Databricks Certification" }
+    {
+      "icon": "briefcase",
+      "value": "2.5+",
+      "label": "Years of Experience"
+    },
+    {
+      "icon": "layers",
+      "value": "300+",
+      "label": "SSRS Reports Migrated"
+    },
+    {
+      "icon": "chart",
+      "value": "10+",
+      "label": "Power BI Dashboards"
+    },
+    {
+      "icon": "badge",
+      "value": "1",
+      "label": "Databricks Certification"
+    }
   ],
   "timeline": [
     {
@@ -18,7 +34,11 @@
       "current": true,
       "icon": "chart",
       "description": "Contributing to the final stretch of the SSRS-to-Databricks migration, while converting transformation logic into DBT models and Databricks notebooks deployed through Azure DevOps CI/CD pipelines.",
-      "tags": ["Databricks", "DBT", "Azure DevOps"]
+      "tags": [
+        "Databricks",
+        "DBT",
+        "Azure DevOps"
+      ]
     },
     {
       "role": "Junior Data Analyst",
@@ -29,7 +49,12 @@
       "current": false,
       "icon": "database",
       "description": "Played a key role in the end-to-end migration of 200–400 SSRS reports from SQL Server to Databricks, automating extraction of table references and T-SQL from .rdl files with Python, configuring ODBC connectivity, and validating query outputs to resolve data-sync and logic discrepancies.",
-      "tags": ["SSRS Migration", "Python", "SQL", "Data Validation"]
+      "tags": [
+        "SSRS Migration",
+        "Python",
+        "SQL",
+        "Data Validation"
+      ]
     },
     {
       "role": "Graduate Engineering Trainee",
@@ -40,7 +65,12 @@
       "current": false,
       "icon": "star",
       "description": "Started my data journey learning SQL Server fundamentals, Power BI reporting and the SSRS ecosystem, while assisting with early dashboard builds and query support to get up to speed with the team's data stack.",
-      "tags": ["SQL Server", "Power BI", "SSRS", "Foundations"]
+      "tags": [
+        "SQL Server",
+        "Power BI",
+        "SSRS",
+        "Foundations"
+      ]
     }
   ]
 }
